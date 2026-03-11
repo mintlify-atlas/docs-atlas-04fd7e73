@@ -1,0 +1,283 @@
+---
+title: Guide Locations API
+description: Manage service locations where guides operate
+---
+
+# Guide Locations API
+
+The Guide Locations API manages the locations where guides provide their services. Each guide can operate in multiple cities, regions, or destinations, helping tourists find guides available in their desired travel locations.
+
+## Base Endpoint
+
+```
+/api/guide_locations
+```
+
+## Guide Location Model
+
+<ResponseField name="guideLocationId" type="integer" required>
+  Unique identifier for the guide location
+</ResponseField>
+
+<ResponseField name="userId" type="integer" required>
+  User ID of the guide
+</ResponseField>
+
+<ResponseField name="locationName" type="string" required>
+  Name of the location where the guide operates (e.g., "Cancún", "Oaxaca", "Mexico City")
+</ResponseField>
+
+---
+
+## Add Location to Guide
+
+Add a new service location for a guide.
+
+```bash
+POST /api/guide_locations
+```
+
+### Request Body
+
+<ParamField path="userId" type="integer" required>
+  User ID of the guide
+</ParamField>
+
+<ParamField path="locationName" type="string" required>
+  Name of the service location
+</ParamField>
+
+### Example Request
+
+```bash
+curl -X POST "http://localhost:8080/api/guide_locations" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 12,
+    "locationName": "Guanajuato"
+  }'
+```
+
+### Example Response
+
+```json
+{
+  "guideLocationId": 1,
+  "userId": 12,
+  "locationName": "Guanajuato"
+}
+```
+
+---
+
+## Get All Guide Locations
+
+Retrieve all guide location records.
+
+```bash
+GET /api/guide_locations
+```
+
+### Example Request
+
+```bash
+curl -X GET "http://localhost:8080/api/guide_locations"
+```
+
+### Example Response
+
+```json
+[
+  {
+    "guideLocationId": 1,
+    "userId": 12,
+    "locationName": "Guanajuato"
+  },
+  {
+    "guideLocationId": 2,
+    "userId": 12,
+    "locationName": "San Miguel de Allende"
+  },
+  {
+    "guideLocationId": 3,
+    "userId": 15,
+    "locationName": "Oaxaca"
+  }
+]
+```
+
+---
+
+## Get Guide Location by ID
+
+Retrieve a specific guide location by ID.
+
+```bash
+GET /api/guide_locations/{id}
+```
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  Guide location ID
+</ParamField>
+
+### Example Request
+
+```bash
+curl -X GET "http://localhost:8080/api/guide_locations/1"
+```
+
+### Example Response
+
+```json
+{
+  "guideLocationId": 1,
+  "userId": 12,
+  "locationName": "Guanajuato"
+}
+```
+
+---
+
+## Update Guide Location
+
+Update an existing guide location.
+
+```bash
+PUT /api/guide_locations/{id}
+```
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  Guide location ID
+</ParamField>
+
+### Request Body
+
+<ParamField path="userId" type="integer" required>
+  User ID of the guide
+</ParamField>
+
+<ParamField path="locationName" type="string" required>
+  Updated location name
+</ParamField>
+
+### Example Request
+
+```bash
+curl -X PUT "http://localhost:8080/api/guide_locations/1" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 12,
+    "locationName": "Guanajuato City"
+  }'
+```
+
+### Example Response
+
+```json
+{
+  "guideLocationId": 1,
+  "userId": 12,
+  "locationName": "Guanajuato City"
+}
+```
+
+---
+
+## Remove Guide Location
+
+Delete a guide location by ID.
+
+```bash
+DELETE /api/guide_locations/{id}
+```
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  Guide location ID
+</ParamField>
+
+### Example Request
+
+```bash
+curl -X DELETE "http://localhost:8080/api/guide_locations/1"
+```
+
+### Example Response
+
+```
+204 No Content
+```
+
+---
+
+## Usage Examples
+
+### Get All Locations for a Guide
+
+To get all service locations for a specific guide:
+
+```bash
+# Get all locations
+curl -X GET "http://localhost:8080/api/guide_locations" \
+  | jq '.[] | select(.userId == 12)'
+```
+
+### Add Multiple Locations for a Guide
+
+To add multiple service locations for a guide:
+
+```bash
+# Add Guanajuato
+curl -X POST "http://localhost:8080/api/guide_locations" \
+  -H "Content-Type: application/json" \
+  -d '{"userId": 12, "locationName": "Guanajuato"}'
+
+# Add San Miguel de Allende
+curl -X POST "http://localhost:8080/api/guide_locations" \
+  -H "Content-Type: application/json" \
+  -d '{"userId": 12, "locationName": "San Miguel de Allende"}'
+
+# Add León
+curl -X POST "http://localhost:8080/api/guide_locations" \
+  -H "Content-Type: application/json" \
+  -d '{"userId": 12, "locationName": "León"}'
+```
+
+---
+
+## Popular Service Locations
+
+Common service locations for guides in Mexico:
+
+| Location | State | Region |
+|----------|-------|--------|
+| Cancún | Quintana Roo | Caribbean Coast |
+| Playa del Carmen | Quintana Roo | Riviera Maya |
+| Tulum | Quintana Roo | Riviera Maya |
+| Mexico City | CDMX | Central Mexico |
+| Oaxaca | Oaxaca | Southern Mexico |
+| Guanajuato | Guanajuato | Bajío |
+| San Miguel de Allende | Guanajuato | Bajío |
+| Puerto Vallarta | Jalisco | Pacific Coast |
+| Guadalajara | Jalisco | Western Mexico |
+| Merida | Yucatán | Yucatán Peninsula |
+| Cabo San Lucas | Baja California Sur | Baja Peninsula |
+| Puebla | Puebla | Central Mexico |
+
+---
+
+## Related Endpoints
+
+<CardGroup cols={2}>
+  <Card title="Guide Profiles" icon="compass" href="/api/guide-profiles">
+    Manage guide profiles
+  </Card>
+  <Card title="Destinations" icon="map-location-dot" href="/api/destinations">
+    Browse official destination listings
+  </Card>
+</CardGroup>

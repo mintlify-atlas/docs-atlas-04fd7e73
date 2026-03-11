@@ -1,0 +1,246 @@
+---
+title: Tourist Profile Interests API
+description: Associate tourist profiles with interest categories
+---
+
+# Tourist Profile Interests API
+
+The Tourist Profile Interests API manages the many-to-many relationship between tourist profiles and interest categories. This allows tourists to select multiple interests for their profile to improve tour matching and recommendations.
+
+## Base Endpoint
+
+```
+/api/tourist_profile_interests
+```
+
+## Tourist Profile Interest Model
+
+This is a join table with a composite primary key.
+
+<ResponseField name="userId" type="integer" required>
+  User ID of the tourist profile
+</ResponseField>
+
+<ResponseField name="interestId" type="integer" required>
+  Interest category ID
+</ResponseField>
+
+---
+
+## Add Interest to Tourist Profile
+
+Associate an interest category with a tourist profile.
+
+```bash
+POST /api/tourist_profile_interests
+```
+
+### Request Body
+
+<ParamField path="userId" type="integer" required>
+  User ID of the tourist
+</ParamField>
+
+<ParamField path="interestId" type="integer" required>
+  Interest category ID to add
+</ParamField>
+
+### Example Request
+
+```bash
+curl -X POST "http://localhost:8080/api/tourist_profile_interests" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 5,
+    "interestId": 1
+  }'
+```
+
+### Example Response
+
+```json
+{
+  "userId": 5,
+  "interestId": 1
+}
+```
+
+---
+
+## Get All Tourist Profile Interests
+
+Retrieve all tourist-interest associations.
+
+```bash
+GET /api/tourist_profile_interests
+```
+
+### Example Request
+
+```bash
+curl -X GET "http://localhost:8080/api/tourist_profile_interests"
+```
+
+### Example Response
+
+```json
+[
+  {
+    "userId": 5,
+    "interestId": 1
+  },
+  {
+    "userId": 5,
+    "interestId": 3
+  },
+  {
+    "userId": 7,
+    "interestId": 2
+  }
+]
+```
+
+---
+
+## Get Specific Tourist Profile Interest
+
+Retrieve a specific tourist-interest association using the composite key.
+
+```bash
+GET /api/tourist_profile_interests/{userId}/{interestId}
+```
+
+### Path Parameters
+
+<ParamField path="userId" type="integer" required>
+  Tourist user ID
+</ParamField>
+
+<ParamField path="interestId" type="integer" required>
+  Interest category ID
+</ParamField>
+
+### Example Request
+
+```bash
+curl -X GET "http://localhost:8080/api/tourist_profile_interests/5/1"
+```
+
+### Example Response
+
+```json
+{
+  "userId": 5,
+  "interestId": 1
+}
+```
+
+---
+
+## Update Tourist Profile Interest
+
+Update a tourist-interest association (rarely used since it's a simple join).
+
+```bash
+PUT /api/tourist_profile_interests/{userId}/{interestId}
+```
+
+### Path Parameters
+
+<ParamField path="userId" type="integer" required>
+  Tourist user ID
+</ParamField>
+
+<ParamField path="interestId" type="integer" required>
+  Interest category ID
+</ParamField>
+
+### Request Body
+
+<ParamField path="userId" type="integer" required>
+  User ID (must match path parameter)
+</ParamField>
+
+<ParamField path="interestId" type="integer" required>
+  Interest ID (must match path parameter)
+</ParamField>
+
+---
+
+## Remove Interest from Tourist Profile
+
+Remove an interest association from a tourist profile.
+
+```bash
+DELETE /api/tourist_profile_interests/{userId}/{interestId}
+```
+
+### Path Parameters
+
+<ParamField path="userId" type="integer" required>
+  Tourist user ID
+</ParamField>
+
+<ParamField path="interestId" type="integer" required>
+  Interest category ID
+</ParamField>
+
+### Example Request
+
+```bash
+curl -X DELETE "http://localhost:8080/api/tourist_profile_interests/5/1"
+```
+
+### Example Response
+
+```
+204 No Content
+```
+
+---
+
+## Usage Examples
+
+### Get All Interests for a Tourist
+
+To get all interests for a specific tourist, filter the results by userId:
+
+```bash
+# Get all associations
+curl -X GET "http://localhost:8080/api/tourist_profile_interests" \
+  | jq '.[] | select(.userId == 5)'
+```
+
+### Add Multiple Interests
+
+To add multiple interests to a tourist profile, make multiple POST requests:
+
+```bash
+# Add Adventure
+curl -X POST "http://localhost:8080/api/tourist_profile_interests" \
+  -H "Content-Type: application/json" \
+  -d '{"userId": 5, "interestId": 1}'
+
+# Add Culture
+curl -X POST "http://localhost:8080/api/tourist_profile_interests" \
+  -H "Content-Type: application/json" \
+  -d '{"userId": 5, "interestId": 2}'
+
+# Add Gastronomy
+curl -X POST "http://localhost:8080/api/tourist_profile_interests" \
+  -H "Content-Type: application/json" \
+  -d '{"userId": 5, "interestId": 3}'
+```
+
+---
+
+## Related Endpoints
+
+<CardGroup cols={2}>
+  <Card title="Tourist Profiles" icon="user" href="/api/tourist-profiles">
+    Manage tourist profiles
+  </Card>
+  <Card title="Interests" icon="compass" href="/api/interests">
+    Browse available interest categories
+  </Card>
+</CardGroup>

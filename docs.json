@@ -80,7 +80,12 @@
             "pages": [
               "api/users",
               "api/tourist-profiles",
+              "api/tourist-profile-interests",
+              "api/interests",
               "api/guide-profiles",
+              "api/guide-profile-expertise",
+              "api/guide-expertise-areas",
+              "api/guide-locations",
               "api/languages"
             ]
           },

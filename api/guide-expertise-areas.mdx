@@ -1,0 +1,236 @@
+---
+title: Guide Expertise Areas API
+description: Manage guide expertise area categories for profile specialization
+---
+
+# Guide Expertise Areas API
+
+The Guide Expertise Areas API provides access to expertise categories that guides can select to showcase their specializations. Expertise areas help tourists find guides with the right skills and knowledge for their desired experiences.
+
+## Base Endpoint
+
+```
+/api/guide_expertise_areas
+```
+
+## Guide Expertise Area Model
+
+<ResponseField name="expertiseId" type="integer" required>
+  Unique identifier for the expertise area category
+</ResponseField>
+
+<ResponseField name="name" type="string" required>
+  Name of the expertise area (e.g., "Archaeological Sites", "Adventure Sports", "Local Cuisine")
+</ResponseField>
+
+---
+
+## Create Expertise Area
+
+Create a new expertise area category.
+
+```bash
+POST /api/guide_expertise_areas
+```
+
+### Request Body
+
+<ParamField path="name" type="string" required>
+  Name of the expertise area
+</ParamField>
+
+### Example Request
+
+```bash
+curl -X POST "http://localhost:8080/api/guide_expertise_areas" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Archaeological Sites"
+  }'
+```
+
+### Example Response
+
+```json
+{
+  "expertiseId": 1,
+  "name": "Archaeological Sites"
+}
+```
+
+---
+
+## Get All Expertise Areas
+
+Retrieve all available expertise area categories.
+
+```bash
+GET /api/guide_expertise_areas
+```
+
+### Example Request
+
+```bash
+curl -X GET "http://localhost:8080/api/guide_expertise_areas"
+```
+
+### Example Response
+
+```json
+[
+  {
+    "expertiseId": 1,
+    "name": "Archaeological Sites"
+  },
+  {
+    "expertiseId": 2,
+    "name": "Adventure Sports"
+  },
+  {
+    "expertiseId": 3,
+    "name": "Local Cuisine"
+  },
+  {
+    "expertiseId": 4,
+    "name": "Wildlife & Nature"
+  },
+  {
+    "expertiseId": 5,
+    "name": "Cultural Heritage"
+  }
+]
+```
+
+---
+
+## Get Expertise Area by ID
+
+Retrieve a specific expertise area by ID.
+
+```bash
+GET /api/guide_expertise_areas/{id}
+```
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  Expertise area ID
+</ParamField>
+
+### Example Request
+
+```bash
+curl -X GET "http://localhost:8080/api/guide_expertise_areas/1"
+```
+
+### Example Response
+
+```json
+{
+  "expertiseId": 1,
+  "name": "Archaeological Sites"
+}
+```
+
+---
+
+## Update Expertise Area
+
+Update an existing expertise area category.
+
+```bash
+PUT /api/guide_expertise_areas/{id}
+```
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  Expertise area ID
+</ParamField>
+
+### Request Body
+
+<ParamField path="name" type="string" required>
+  Updated name of the expertise area
+</ParamField>
+
+### Example Request
+
+```bash
+curl -X PUT "http://localhost:8080/api/guide_expertise_areas/1" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Mayan Archaeological Sites"
+  }'
+```
+
+### Example Response
+
+```json
+{
+  "expertiseId": 1,
+  "name": "Mayan Archaeological Sites"
+}
+```
+
+---
+
+## Delete Expertise Area
+
+Delete an expertise area category by ID.
+
+```bash
+DELETE /api/guide_expertise_areas/{id}
+```
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  Expertise area ID
+</ParamField>
+
+### Example Request
+
+```bash
+curl -X DELETE "http://localhost:8080/api/guide_expertise_areas/1"
+```
+
+### Example Response
+
+```
+204 No Content
+```
+
+---
+
+## Common Expertise Areas
+
+Here are typical expertise areas used in the Kin Conecta platform:
+
+| Expertise Area | Description |
+|----------------|-------------|
+| Archaeological Sites | Mayan ruins, Aztec temples, ancient civilizations |
+| Adventure Sports | Rock climbing, rappelling, zip-lining, extreme sports |
+| Local Cuisine | Traditional food, cooking techniques, culinary history |
+| Wildlife & Nature | Flora and fauna identification, eco-tourism, conservation |
+| Cultural Heritage | Traditional crafts, indigenous communities, folklore |
+| Historical Architecture | Colonial buildings, religious sites, architectural styles |
+| Marine Biology | Coral reefs, sea life, snorkeling/diving guides |
+| Photography | Landscape photography, cultural photography techniques |
+| Artisan Crafts | Traditional textiles, pottery, jewelry making |
+| Wine & Spirits | Mezcal, tequila, wine regions, distillery tours |
+| Urban Exploration | Street art, neighborhoods, modern culture |
+| Wellness & Spirituality | Traditional medicine, spiritual practices, ceremonies |
+
+---
+
+## Related Endpoints
+
+<CardGroup cols={2}>
+  <Card title="Guide Profiles" icon="compass" href="/api/guide-profiles">
+    Manage guide profiles that use expertise areas
+  </Card>
+  <Card title="Guide Profile Expertise" icon="briefcase" href="/api/guide-profile-expertise">
+    Associate expertise areas with guide profiles
+  </Card>
+</CardGroup>

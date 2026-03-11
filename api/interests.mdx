@@ -1,0 +1,234 @@
+---
+title: Interests API
+description: Manage tourist interest categories for profile customization
+---
+
+# Interests API
+
+The Interests API provides access to interest categories that tourists can select to customize their profiles and improve tour matching. Interests represent tourist preferences such as adventure, culture, gastronomy, history, and more.
+
+## Base Endpoint
+
+```
+/api/interests
+```
+
+## Interest Model
+
+<ResponseField name="interestId" type="integer" required>
+  Unique identifier for the interest category
+</ResponseField>
+
+<ResponseField name="name" type="string" required>
+  Name of the interest category (e.g., "Adventure", "Culture", "Gastronomy")
+</ResponseField>
+
+---
+
+## Create Interest
+
+Create a new interest category.
+
+```bash
+POST /api/interests
+```
+
+### Request Body
+
+<ParamField path="name" type="string" required>
+  Name of the interest category
+</ParamField>
+
+### Example Request
+
+```bash
+curl -X POST "http://localhost:8080/api/interests" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Adventure"
+  }'
+```
+
+### Example Response
+
+```json
+{
+  "interestId": 1,
+  "name": "Adventure"
+}
+```
+
+---
+
+## Get All Interests
+
+Retrieve all available interest categories.
+
+```bash
+GET /api/interests
+```
+
+### Example Request
+
+```bash
+curl -X GET "http://localhost:8080/api/interests"
+```
+
+### Example Response
+
+```json
+[
+  {
+    "interestId": 1,
+    "name": "Adventure"
+  },
+  {
+    "interestId": 2,
+    "name": "Culture"
+  },
+  {
+    "interestId": 3,
+    "name": "Gastronomy"
+  },
+  {
+    "interestId": 4,
+    "name": "History"
+  },
+  {
+    "interestId": 5,
+    "name": "Nature"
+  }
+]
+```
+
+---
+
+## Get Interest by ID
+
+Retrieve a specific interest category by ID.
+
+```bash
+GET /api/interests/{id}
+```
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  Interest category ID
+</ParamField>
+
+### Example Request
+
+```bash
+curl -X GET "http://localhost:8080/api/interests/1"
+```
+
+### Example Response
+
+```json
+{
+  "interestId": 1,
+  "name": "Adventure"
+}
+```
+
+---
+
+## Update Interest
+
+Update an existing interest category.
+
+```bash
+PUT /api/interests/{id}
+```
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  Interest category ID
+</ParamField>
+
+### Request Body
+
+<ParamField path="name" type="string" required>
+  Updated name of the interest category
+</ParamField>
+
+### Example Request
+
+```bash
+curl -X PUT "http://localhost:8080/api/interests/1" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Extreme Adventure"
+  }'
+```
+
+### Example Response
+
+```json
+{
+  "interestId": 1,
+  "name": "Extreme Adventure"
+}
+```
+
+---
+
+## Delete Interest
+
+Delete an interest category by ID.
+
+```bash
+DELETE /api/interests/{id}
+```
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  Interest category ID
+</ParamField>
+
+### Example Request
+
+```bash
+curl -X DELETE "http://localhost:8080/api/interests/1"
+```
+
+### Example Response
+
+```
+204 No Content
+```
+
+---
+
+## Common Interest Categories
+
+Here are typical interest categories used in the Kin Conecta platform:
+
+| Interest | Description |
+|----------|-------------|
+| Adventure | Outdoor activities, adrenaline sports, exploration |
+| Culture | Museums, art galleries, cultural events |
+| Gastronomy | Food tours, cooking classes, local cuisine |
+| History | Archaeological sites, historical landmarks, heritage |
+| Nature | Parks, wildlife, ecological tours |
+| Photography | Scenic spots, photo tours, landscape photography |
+| Archaeology | Ancient ruins, archaeological sites, Mayan/Aztec culture |
+| Beach | Coastal activities, water sports, beach relaxation |
+| Urban | City tours, street art, urban exploration |
+| Wellness | Spa, yoga, meditation, wellness retreats |
+
+---
+
+## Related Endpoints
+
+<CardGroup cols={2}>
+  <Card title="Tourist Profiles" icon="user" href="/api/tourist-profiles">
+    Manage tourist profiles that use interests
+  </Card>
+  <Card title="Tourist Profile Interests" icon="heart" href="/api/tourist-profile-interests">
+    Associate interests with tourist profiles
+  </Card>
+</CardGroup>

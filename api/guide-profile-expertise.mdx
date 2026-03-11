@@ -1,0 +1,262 @@
+---
+title: Guide Profile Expertise API
+description: Associate guide profiles with expertise area categories
+---
+
+# Guide Profile Expertise API
+
+The Guide Profile Expertise API manages the many-to-many relationship between guide profiles and expertise area categories. This allows guides to showcase multiple areas of specialization on their profile to attract tourists seeking specific expertise.
+
+## Base Endpoint
+
+```
+/api/guide_profile_expertise
+```
+
+## Guide Profile Expertise Model
+
+This is a join table with a composite primary key.
+
+<ResponseField name="userId" type="integer" required>
+  User ID of the guide profile
+</ResponseField>
+
+<ResponseField name="expertiseId" type="integer" required>
+  Expertise area category ID
+</ResponseField>
+
+---
+
+## Add Expertise to Guide Profile
+
+Associate an expertise area with a guide profile.
+
+```bash
+POST /api/guide_profile_expertise
+```
+
+### Request Body
+
+<ParamField path="userId" type="integer" required>
+  User ID of the guide
+</ParamField>
+
+<ParamField path="expertiseId" type="integer" required>
+  Expertise area ID to add
+</ParamField>
+
+### Example Request
+
+```bash
+curl -X POST "http://localhost:8080/api/guide_profile_expertise" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 12,
+    "expertiseId": 1
+  }'
+```
+
+### Example Response
+
+```json
+{
+  "userId": 12,
+  "expertiseId": 1
+}
+```
+
+---
+
+## Get All Guide Profile Expertise
+
+Retrieve all guide-expertise associations.
+
+```bash
+GET /api/guide_profile_expertise
+```
+
+### Example Request
+
+```bash
+curl -X GET "http://localhost:8080/api/guide_profile_expertise"
+```
+
+### Example Response
+
+```json
+[
+  {
+    "userId": 12,
+    "expertiseId": 1
+  },
+  {
+    "userId": 12,
+    "expertiseId": 3
+  },
+  {
+    "userId": 15,
+    "expertiseId": 2
+  }
+]
+```
+
+---
+
+## Get Specific Guide Profile Expertise
+
+Retrieve a specific guide-expertise association using the composite key.
+
+```bash
+GET /api/guide_profile_expertise/{userId}/{expertiseId}
+```
+
+### Path Parameters
+
+<ParamField path="userId" type="integer" required>
+  Guide user ID
+</ParamField>
+
+<ParamField path="expertiseId" type="integer" required>
+  Expertise area ID
+</ParamField>
+
+### Example Request
+
+```bash
+curl -X GET "http://localhost:8080/api/guide_profile_expertise/12/1"
+```
+
+### Example Response
+
+```json
+{
+  "userId": 12,
+  "expertiseId": 1
+}
+```
+
+---
+
+## Update Guide Profile Expertise
+
+Update a guide-expertise association (rarely used since it's a simple join).
+
+```bash
+PUT /api/guide_profile_expertise/{userId}/{expertiseId}
+```
+
+### Path Parameters
+
+<ParamField path="userId" type="integer" required>
+  Guide user ID
+</ParamField>
+
+<ParamField path="expertiseId" type="integer" required>
+  Expertise area ID
+</ParamField>
+
+### Request Body
+
+<ParamField path="userId" type="integer" required>
+  User ID (must match path parameter)
+</ParamField>
+
+<ParamField path="expertiseId" type="integer" required>
+  Expertise ID (must match path parameter)
+</ParamField>
+
+---
+
+## Remove Expertise from Guide Profile
+
+Remove an expertise association from a guide profile.
+
+```bash
+DELETE /api/guide_profile_expertise/{userId}/{expertiseId}
+```
+
+### Path Parameters
+
+<ParamField path="userId" type="integer" required>
+  Guide user ID
+</ParamField>
+
+<ParamField path="expertiseId" type="integer" required>
+  Expertise area ID
+</ParamField>
+
+### Example Request
+
+```bash
+curl -X DELETE "http://localhost:8080/api/guide_profile_expertise/12/1"
+```
+
+### Example Response
+
+```
+204 No Content
+```
+
+---
+
+## Usage Examples
+
+### Get All Expertise Areas for a Guide
+
+To get all expertise areas for a specific guide, filter the results by userId:
+
+```bash
+# Get all associations for guide user 12
+curl -X GET "http://localhost:8080/api/guide_profile_expertise" \
+  | jq '.[] | select(.userId == 12)'
+```
+
+### Add Multiple Expertise Areas
+
+To add multiple expertise areas to a guide profile, make multiple POST requests:
+
+```bash
+# Add Archaeological Sites expertise
+curl -X POST "http://localhost:8080/api/guide_profile_expertise" \
+  -H "Content-Type: application/json" \
+  -d '{"userId": 12, "expertiseId": 1}'
+
+# Add Local Cuisine expertise
+curl -X POST "http://localhost:8080/api/guide_profile_expertise" \
+  -H "Content-Type: application/json" \
+  -d '{"userId": 12, "expertiseId": 3}'
+
+# Add Cultural Heritage expertise
+curl -X POST "http://localhost:8080/api/guide_profile_expertise" \
+  -H "Content-Type: application/json" \
+  -d '{"userId": 12, "expertiseId": 5}'
+```
+
+---
+
+## Best Practices
+
+<Note>
+Guides should select 2-5 expertise areas that accurately represent their knowledge and experience. Having too many expertise areas may dilute credibility, while having too few may limit discoverability.
+</Note>
+
+### Recommended Expertise Combinations
+
+- **Archaeology Guide**: Archaeological Sites + Cultural Heritage + Historical Architecture
+- **Adventure Guide**: Adventure Sports + Wildlife & Nature + Photography
+- **Culinary Guide**: Local Cuisine + Wine & Spirits + Artisan Crafts
+- **Eco-Tourism Guide**: Wildlife & Nature + Marine Biology + Wellness & Spirituality
+- **Cultural Guide**: Cultural Heritage + Artisan Crafts + Urban Exploration
+
+---
+
+## Related Endpoints
+
+<CardGroup cols={2}>
+  <Card title="Guide Profiles" icon="compass" href="/api/guide-profiles">
+    Manage guide profiles
+  </Card>
+  <Card title="Guide Expertise Areas" icon="graduation-cap" href="/api/guide-expertise-areas">
+    Browse available expertise categories
+  </Card>
+</CardGroup>
