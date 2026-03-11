@@ -1,0 +1,277 @@
+---
+title: 'Destinations'
+description: 'Manage destinations (cities and states in Mexico)'
+---
+
+## Create Destination
+
+<api method="POST" path="/api/destinations">
+Creates a new destination.
+
+### Request Body
+
+<ParamField body="city" type="String" required>
+  Name of the city
+</ParamField>
+
+<ParamField body="state" type="String" required>
+  Name of the state/province
+</ParamField>
+
+<ParamField body="country" type="String" required>
+  Country name (e.g., "Mexico")
+</ParamField>
+
+<ParamField body="description" type="String">
+  Description of the destination and its attractions
+</ParamField>
+
+<ParamField body="imageUrl" type="String">
+  URL of the destination's image
+</ParamField>
+
+<ParamField body="isFeatured" type="Boolean">
+  Whether this destination is featured on the platform
+</ParamField>
+
+### Response
+
+<ResponseField name="destinationId" type="Long">
+  Unique identifier for the destination
+</ResponseField>
+
+<ResponseField name="city" type="String">
+  City name
+</ResponseField>
+
+<ResponseField name="state" type="String">
+  State/province name
+</ResponseField>
+
+<ResponseField name="country" type="String">
+  Country name
+</ResponseField>
+
+<ResponseField name="description" type="String">
+  Destination description
+</ResponseField>
+
+<ResponseField name="imageUrl" type="String">
+  Image URL
+</ResponseField>
+
+<ResponseField name="isFeatured" type="Boolean">
+  Featured status
+</ResponseField>
+
+### Example Request
+
+```bash
+curl -X POST http://localhost:8080/api/destinations \
+  -H "Content-Type: application/json" \
+  -d '{
+    "city": "Guanajuato",
+    "state": "Guanajuato",
+    "country": "Mexico",
+    "description": "Colonial city known for its colorful buildings, underground tunnels, and rich mining history",
+    "imageUrl": "https://example.com/destinations/guanajuato.jpg",
+    "isFeatured": true
+  }'
+```
+
+### Example Response
+
+```json
+{
+  "destinationId": 45,
+  "city": "Guanajuato",
+  "state": "Guanajuato",
+  "country": "Mexico",
+  "description": "Colonial city known for its colorful buildings, underground tunnels, and rich mining history",
+  "imageUrl": "https://example.com/destinations/guanajuato.jpg",
+  "isFeatured": true
+}
+```
+
+</api>
+
+## Get All Destinations
+
+<api method="GET" path="/api/destinations">
+Retrieves all destinations in the system.
+
+### Response
+
+Returns an array of destination objects.
+
+### Example Request
+
+```bash
+curl http://localhost:8080/api/destinations
+```
+
+### Example Response
+
+```json
+[
+  {
+    "destinationId": 45,
+    "city": "Guanajuato",
+    "state": "Guanajuato",
+    "country": "Mexico",
+    "description": "Colonial city known for its colorful buildings, underground tunnels, and rich mining history",
+    "imageUrl": "https://example.com/destinations/guanajuato.jpg",
+    "isFeatured": true
+  },
+  {
+    "destinationId": 46,
+    "city": "Oaxaca",
+    "state": "Oaxaca",
+    "country": "Mexico",
+    "description": "Rich in indigenous culture, famous for mezcal, traditional crafts, and archaeological sites",
+    "imageUrl": "https://example.com/destinations/oaxaca.jpg",
+    "isFeatured": true
+  },
+  {
+    "destinationId": 47,
+    "city": "Cancún",
+    "state": "Quintana Roo",
+    "country": "Mexico",
+    "description": "Caribbean paradise with pristine beaches, Mayan ruins, and vibrant nightlife",
+    "imageUrl": "https://example.com/destinations/cancun.jpg",
+    "isFeatured": false
+  }
+]
+```
+
+</api>
+
+## Get Destination by ID
+
+<api method="GET" path="/api/destinations/{id}">
+Retrieves a specific destination by its ID.
+
+### Path Parameters
+
+<ParamField path="id" type="Long" required>
+  The unique identifier of the destination
+</ParamField>
+
+### Response
+
+Returns a single destination object.
+
+### Example Request
+
+```bash
+curl http://localhost:8080/api/destinations/45
+```
+
+### Example Response
+
+```json
+{
+  "destinationId": 45,
+  "city": "Guanajuato",
+  "state": "Guanajuato",
+  "country": "Mexico",
+  "description": "Colonial city known for its colorful buildings, underground tunnels, and rich mining history",
+  "imageUrl": "https://example.com/destinations/guanajuato.jpg",
+  "isFeatured": true
+}
+```
+
+</api>
+
+## Update Destination
+
+<api method="PUT" path="/api/destinations/{id}">
+Updates an existing destination.
+
+### Path Parameters
+
+<ParamField path="id" type="Long" required>
+  The unique identifier of the destination to update
+</ParamField>
+
+### Request Body
+
+All fields are optional - only send the fields you want to update.
+
+<ParamField body="city" type="String">
+  City name
+</ParamField>
+
+<ParamField body="state" type="String">
+  State/province name
+</ParamField>
+
+<ParamField body="country" type="String">
+  Country name
+</ParamField>
+
+<ParamField body="description" type="String">
+  Destination description
+</ParamField>
+
+<ParamField body="imageUrl" type="String">
+  Image URL
+</ParamField>
+
+<ParamField body="isFeatured" type="Boolean">
+  Featured status
+</ParamField>
+
+### Response
+
+Returns the updated destination object.
+
+### Example Request
+
+```bash
+curl -X PUT http://localhost:8080/api/destinations/45 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "description": "UNESCO World Heritage colonial city known for its colorful buildings, underground tunnels, rich mining history, and vibrant cultural festivals",
+    "isFeatured": true
+  }'
+```
+
+### Example Response
+
+```json
+{
+  "destinationId": 45,
+  "city": "Guanajuato",
+  "state": "Guanajuato",
+  "country": "Mexico",
+  "description": "UNESCO World Heritage colonial city known for its colorful buildings, underground tunnels, rich mining history, and vibrant cultural festivals",
+  "imageUrl": "https://example.com/destinations/guanajuato.jpg",
+  "isFeatured": true
+}
+```
+
+</api>
+
+## Delete Destination
+
+<api method="DELETE" path="/api/destinations/{id}">
+Deletes a destination from the system.
+
+### Path Parameters
+
+<ParamField path="id" type="Long" required>
+  The unique identifier of the destination to delete
+</ParamField>
+
+### Response
+
+Returns HTTP 204 No Content on successful deletion.
+
+### Example Request
+
+```bash
+curl -X DELETE http://localhost:8080/api/destinations/45
+```
+
+</api>

@@ -1,0 +1,315 @@
+---
+title: Compatibility Matching
+description: Deep dive into Kin Conecta's intelligent matching system that connects tourists with compatible guides
+---
+
+Kin Conecta's compatibility matching system uses detailed questionnaires and profile data to connect tourists with guides who match their preferences and travel style.
+
+## Overview
+
+The matching system consists of three main components:
+
+<CardGroup cols={3}>
+  <Card title="Compatibility Profiles" icon="clipboard-question">
+    Detailed profiles capturing preferences for matching
+  </Card>
+  <Card title="Answer Storage" icon="database">
+    Flexible storage for questionnaire responses
+  </Card>
+  <Card title="Favorites System" icon="heart">
+    Save preferred guides and tours for later
+  </Card>
+</CardGroup>
+
+## Compatibility Profiles
+
+Compatibility profiles store structured data used for matching algorithms.
+
+### Data Model
+
+```java
+// Model: CompatibilityProfile.java
+package org.generation.socialNetwork.matching.model;
+
+@Entity
+@Table(name = "compatibility_profiles")
+public class CompatibilityProfile {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long compatibilityProfileId;
+    
+    private Long userId;
+    
+    @Enumerated(EnumType.STRING)
+    private CompatibilityProfileRole role; // TOURIST or GUIDE
+    
+    private String name;
+    private String imgUrl;
+    private String description;
+    private String email;
+    private LocalDate dateOfBirth;
+    
+    // Phone fields
+    private String phoneCountryCode;
+    private String phoneNumber;
+    private String phoneE164;
+    
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+}
+```
+
+### Key Features
+
+- **Role-Based**: Separate profiles for `TOURIST` and `GUIDE` roles
+- **User Linkage**: Connected to user accounts via `user_id`
+- **Contact Info**: Email and international phone number support (E.164 format)
+- **Timestamps**: Tracks creation and updates for data freshness
+
+<Note>
+Users can have multiple compatibility profiles for different contexts (e.g., solo travel vs. family trips).
+</Note>
+
+## Compatibility Answers
+
+The answer system provides flexible storage for questionnaire responses.
+
+### Data Structure
+
+```java
+// Model: CompatibilityAnswer.java
+@Entity
+@Table(name = "compatibility_answers")
+public class CompatibilityAnswer {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long answerId;
+    
+    private Long compatibilityProfileId;
+    private String questionKey;  // Identifies the question
+    
+    // Flexible value storage
+    private String valueText;    // For text answers
+    private BigDecimal valueNumber; // For numeric answers
+    private String valueJson;    // For complex/array answers
+    
+    private LocalDateTime createdAt;
+}
+```
+
+### Answer Storage Strategy
+
+The system supports three value types:
+
+<Accordion title="Text Values (valueText)">
+  Used for:
+  - Short text responses
+  - Single-choice selections
+  - Simple string values
+  
+  Example: `"adventure"`, `"moderate"`, `"group"`
+</Accordion>
+
+<Accordion title="Numeric Values (valueNumber)">
+  Used for:
+  - Rating scales (1-5, 1-10)
+  - Budget ranges
+  - Age or duration values
+  
+  Example: `4.5`, `1000`, `7`
+</Accordion>
+
+<Accordion title="JSON Values (valueJson)">
+  Used for:
+  - Multiple selections
+  - Complex nested data
+  - Array of preferences
+  
+  Example: `["hiking", "photography", "food"]`
+</Accordion>
+
+### Question Keys
+
+Questions are identified by keys like:
+
+- `travel_style`
+- `activity_level`
+- `budget_range`
+- `interests`
+- `group_size_preference`
+- `pace_preference`
+- `accommodation_style`
+
+<Tip>
+The question key system allows adding new questions without schema changes. New questions can be added dynamically.
+</Tip>
+
+## Matching Algorithm Factors
+
+While the exact matching algorithm is implemented client-side or in a separate service, the data structure supports matching on:
+
+### Tourist-Guide Compatibility
+
+<CardGroup cols={2}>
+  <Card title="Travel Style Alignment" icon="compass">
+    Matching tourist preferences with guide specialties
+  </Card>
+  <Card title="Activity Level Match" icon="person-running">
+    Pairing tourists with guides offering appropriate intensity
+  </Card>
+  <Card title="Interest Overlap" icon="heart">
+    Finding guides with expertise in tourist interests
+  </Card>
+  <Card title="Communication" icon="language">
+    Matching based on shared languages
+  </Card>
+</CardGroup>
+
+### Scoring Factors
+
+Compatibility scores can be calculated based on:
+
+1. **Profile Data**: From `TouristProfile` and `GuideProfile` models
+2. **Compatibility Answers**: From the questionnaire responses
+3. **Interest Overlap**: Matching `TouristProfileInterest` with `GuideProfileExpertise`
+4. **Language Match**: Common languages between tourist and guide
+5. **Availability**: Guide calendar availability matching tourist dates
+6. **Ratings**: Guide rating average and review count
+7. **Location**: Geographic proximity or location preferences
+
+## Favorites System
+
+Users can save guides and tours they're interested in.
+
+### Favorite Guides
+
+```java
+// Model: FavoriteGuide.java
+@Entity
+@Table(name = "favorite_guides")
+public class FavoriteGuide {
+    @EmbeddedId
+    private FavoriteGuideId id; // Composite: touristId + guideId
+    
+    private LocalDateTime createdAt;
+}
+```
+
+**Endpoints:**
+```
+POST   /api/v1/favorite-guides
+GET    /api/v1/favorite-guides
+DELETE /api/v1/favorite-guides/{touristId}/{guideId}
+```
+
+### Favorite Tours
+
+```java
+// Model: FavoriteTour.java
+@Entity
+@Table(name = "favorite_tours")
+public class FavoriteTour {
+    @EmbeddedId
+    private FavoriteTourId id; // Composite: touristId + tourId
+    
+    private LocalDateTime createdAt;
+}
+```
+
+**Endpoints:**
+```
+POST   /api/v1/favorite-tours
+GET    /api/v1/favorite-tours
+DELETE /api/v1/favorite-tours/{touristId}/{tourId}
+```
+
+<Info>
+Favorites use composite keys to ensure a tourist can only favorite a guide or tour once, preventing duplicates.
+</Info>
+
+## API Reference
+
+### Compatibility Profiles
+
+```
+GET    /api/v1/compatibility-profiles/{id}
+GET    /api/v1/compatibility-profiles?userId={userId}
+POST   /api/v1/compatibility-profiles
+PUT    /api/v1/compatibility-profiles/{id}
+DELETE /api/v1/compatibility-profiles/{id}
+```
+
+### Compatibility Answers
+
+```
+GET    /api/v1/compatibility-answers/{id}
+GET    /api/v1/compatibility-answers?profileId={profileId}
+POST   /api/v1/compatibility-answers
+PUT    /api/v1/compatibility-answers/{id}
+DELETE /api/v1/compatibility-answers/{id}
+```
+
+## Implementation Examples
+
+### Creating a Compatibility Profile
+
+```json
+POST /api/v1/compatibility-profiles
+{
+  "userId": 123,
+  "role": "TOURIST",
+  "name": "Jane Smith",
+  "description": "Adventure seeker looking for cultural experiences",
+  "email": "jane@example.com",
+  "dateOfBirth": "1990-05-15",
+  "phoneCountryCode": "+1",
+  "phoneNumber": "5551234567",
+  "phoneE164": "+15551234567"
+}
+```
+
+### Storing Questionnaire Answers
+
+```json
+POST /api/v1/compatibility-answers
+[
+  {
+    "compatibilityProfileId": 456,
+    "questionKey": "travel_style",
+    "valueText": "adventure"
+  },
+  {
+    "compatibilityProfileId": 456,
+    "questionKey": "activity_level",
+    "valueNumber": 4
+  },
+  {
+    "compatibilityProfileId": 456,
+    "questionKey": "interests",
+    "valueJson": "[\"hiking\", \"photography\", \"local_food\"]"
+  }
+]
+```
+
+<Accordion title="How does the matching algorithm work?">
+  The core matching logic compares compatibility answers, profile preferences, and other factors to generate compatibility scores. The backend provides the data; scoring algorithms can be implemented in the application layer or a dedicated matching service.
+</Accordion>
+
+<Accordion title="Can tourists see their compatibility score with guides?">
+  Yes, the compatibility score can be calculated client-side using the profile data and answers, then displayed to tourists when browsing guides.
+</Accordion>
+
+<Accordion title="How are favorite guides different from matched guides?">
+  Matched guides are algorithmically suggested based on compatibility. Favorite guides are manually saved by tourists for quick access, regardless of compatibility score.
+</Accordion>
+
+## Related Features
+
+<CardGroup cols={2}>
+  <Card title="User Profiles" icon="user" href="/features/profiles">
+    Learn about tourist and guide profile features
+  </Card>
+  <Card title="Bookings" icon="calendar-check" href="/features/bookings">
+    See how matches lead to bookings
+  </Card>
+</CardGroup>

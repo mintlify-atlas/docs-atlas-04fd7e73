@@ -1,0 +1,365 @@
+---
+title: Notifications
+description: Manage user notifications for system events and updates
+---
+
+## Overview
+
+Notifications inform users about important events, updates, and activities within the platform. Each notification can be linked to a related entity and tracks read/unread status.
+
+## Create Notification
+
+<CodeGroup>
+```bash cURL
+curl -X POST http://localhost:8080/api/notifications \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 10,
+    "type": "BOOKING_CONFIRMED",
+    "title": "Booking Confirmed",
+    "body": "Your tour booking for Barcelona City Tour has been confirmed.",
+    "relatedEntityType": "TripBooking",
+    "relatedEntityId": 42,
+    "isRead": false,
+    "createdAt": "2026-03-11T14:30:00",
+    "readAt": null
+  }'
+```
+</CodeGroup>
+
+Create a new notification for a user.
+
+### Request Body
+
+<ParamField body="userId" type="integer" required>
+  The ID of the user who will receive this notification
+</ParamField>
+
+<ParamField body="type" type="string" required>
+  The notification type (e.g., `BOOKING_CONFIRMED`, `MESSAGE_RECEIVED`, `REVIEW_POSTED`)
+</ParamField>
+
+<ParamField body="title" type="string" required>
+  The notification title
+</ParamField>
+
+<ParamField body="body" type="string" required>
+  The notification message body
+</ParamField>
+
+<ParamField body="relatedEntityType" type="string">
+  The type of entity this notification relates to (e.g., `TripBooking`, `ChatMessage`, `Review`)
+</ParamField>
+
+<ParamField body="relatedEntityId" type="integer">
+  The ID of the related entity
+</ParamField>
+
+<ParamField body="isRead" type="boolean">
+  Whether the notification has been read. Defaults to `false`.
+</ParamField>
+
+<ParamField body="createdAt" type="string">
+  Timestamp when the notification was created in ISO 8601 format (e.g., `2026-03-11T14:30:00`)
+</ParamField>
+
+<ParamField body="readAt" type="string">
+  Timestamp when the notification was read in ISO 8601 format. Null if unread.
+</ParamField>
+
+### Response
+
+<ResponseField name="notificationId" type="integer">
+  Unique identifier for the notification
+</ResponseField>
+
+<ResponseField name="userId" type="integer">
+  The user ID who received this notification
+</ResponseField>
+
+<ResponseField name="type" type="string">
+  The notification type
+</ResponseField>
+
+<ResponseField name="title" type="string">
+  The notification title
+</ResponseField>
+
+<ResponseField name="body" type="string">
+  The notification message body
+</ResponseField>
+
+<ResponseField name="relatedEntityType" type="string">
+  The type of related entity
+</ResponseField>
+
+<ResponseField name="relatedEntityId" type="integer">
+  The ID of the related entity
+</ResponseField>
+
+<ResponseField name="isRead" type="boolean">
+  Whether the notification has been read
+</ResponseField>
+
+<ResponseField name="createdAt" type="string">
+  Notification creation timestamp
+</ResponseField>
+
+<ResponseField name="readAt" type="string">
+  Timestamp when notification was read (null if unread)
+</ResponseField>
+
+<ResponseExample>
+```json Response
+{
+  "notificationId": 789,
+  "userId": 10,
+  "type": "BOOKING_CONFIRMED",
+  "title": "Booking Confirmed",
+  "body": "Your tour booking for Barcelona City Tour has been confirmed.",
+  "relatedEntityType": "TripBooking",
+  "relatedEntityId": 42,
+  "isRead": false,
+  "createdAt": "2026-03-11T14:30:00",
+  "readAt": null
+}
+```
+</ResponseExample>
+
+---
+
+## Get All Notifications
+
+<CodeGroup>
+```bash cURL
+curl -X GET http://localhost:8080/api/notifications \
+  -H "Content-Type: application/json"
+```
+</CodeGroup>
+
+Retrieve a list of all notifications in the system.
+
+### Response
+
+Returns an array of notification objects.
+
+<ResponseExample>
+```json Response
+[
+  {
+    "notificationId": 789,
+    "userId": 10,
+    "type": "BOOKING_CONFIRMED",
+    "title": "Booking Confirmed",
+    "body": "Your tour booking for Barcelona City Tour has been confirmed.",
+    "relatedEntityType": "TripBooking",
+    "relatedEntityId": 42,
+    "isRead": true,
+    "createdAt": "2026-03-11T14:30:00",
+    "readAt": "2026-03-11T15:00:00"
+  },
+  {
+    "notificationId": 790,
+    "userId": 10,
+    "type": "MESSAGE_RECEIVED",
+    "title": "New Message",
+    "body": "You have a new message from your guide.",
+    "relatedEntityType": "ChatMessage",
+    "relatedEntityId": 123,
+    "isRead": false,
+    "createdAt": "2026-03-11T16:20:00",
+    "readAt": null
+  }
+]
+```
+</ResponseExample>
+
+---
+
+## Get Notification by ID
+
+<CodeGroup>
+```bash cURL
+curl -X GET http://localhost:8080/api/notifications/789 \
+  -H "Content-Type: application/json"
+```
+</CodeGroup>
+
+Retrieve a specific notification by its ID.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The unique identifier of the notification
+</ParamField>
+
+### Response
+
+<ResponseExample>
+```json Response
+{
+  "notificationId": 789,
+  "userId": 10,
+  "type": "BOOKING_CONFIRMED",
+  "title": "Booking Confirmed",
+  "body": "Your tour booking for Barcelona City Tour has been confirmed.",
+  "relatedEntityType": "TripBooking",
+  "relatedEntityId": 42,
+  "isRead": true,
+  "createdAt": "2026-03-11T14:30:00",
+  "readAt": "2026-03-11T15:00:00"
+}
+```
+</ResponseExample>
+
+---
+
+## Update Notification
+
+<CodeGroup>
+```bash cURL
+curl -X PUT http://localhost:8080/api/notifications/789 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 10,
+    "type": "BOOKING_CONFIRMED",
+    "title": "Booking Confirmed",
+    "body": "Your tour booking for Barcelona City Tour has been confirmed.",
+    "relatedEntityType": "TripBooking",
+    "relatedEntityId": 42,
+    "isRead": true,
+    "createdAt": "2026-03-11T14:30:00",
+    "readAt": "2026-03-11T15:00:00"
+  }'
+```
+</CodeGroup>
+
+Update an existing notification. Commonly used to mark notifications as read.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The unique identifier of the notification to update
+</ParamField>
+
+### Request Body
+
+<ParamField body="userId" type="integer">
+  The ID of the user who received this notification
+</ParamField>
+
+<ParamField body="type" type="string">
+  The notification type
+</ParamField>
+
+<ParamField body="title" type="string">
+  The notification title
+</ParamField>
+
+<ParamField body="body" type="string">
+  The notification message body
+</ParamField>
+
+<ParamField body="relatedEntityType" type="string">
+  The type of entity this notification relates to
+</ParamField>
+
+<ParamField body="relatedEntityId" type="integer">
+  The ID of the related entity
+</ParamField>
+
+<ParamField body="isRead" type="boolean">
+  Whether the notification has been read. Set to `true` to mark as read.
+</ParamField>
+
+<ParamField body="createdAt" type="string">
+  Notification creation timestamp in ISO 8601 format
+</ParamField>
+
+<ParamField body="readAt" type="string">
+  Timestamp when the notification was read. Set this along with `isRead: true` to mark as read.
+</ParamField>
+
+### Response
+
+<ResponseExample>
+```json Response
+{
+  "notificationId": 789,
+  "userId": 10,
+  "type": "BOOKING_CONFIRMED",
+  "title": "Booking Confirmed",
+  "body": "Your tour booking for Barcelona City Tour has been confirmed.",
+  "relatedEntityType": "TripBooking",
+  "relatedEntityId": 42,
+  "isRead": true,
+  "createdAt": "2026-03-11T14:30:00",
+  "readAt": "2026-03-11T15:00:00"
+}
+```
+</ResponseExample>
+
+---
+
+## Delete Notification
+
+<CodeGroup>
+```bash cURL
+curl -X DELETE http://localhost:8080/api/notifications/789 \
+  -H "Content-Type: application/json"
+```
+</CodeGroup>
+
+Permanently delete a notification.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The unique identifier of the notification to delete
+</ParamField>
+
+### Response
+
+Returns a success status code (typically 204 No Content) if the deletion was successful.
+
+---
+
+## Notification Types
+
+Common notification types include:
+
+- **BOOKING_CONFIRMED**: Trip booking has been confirmed
+- **BOOKING_CANCELLED**: Trip booking has been cancelled
+- **MESSAGE_RECEIVED**: New chat message received
+- **REVIEW_POSTED**: New review posted on a tour or guide
+- **PAYMENT_RECEIVED**: Payment has been processed
+- **TOUR_REMINDER**: Upcoming tour reminder
+- **PROFILE_UPDATE**: Profile information updated
+
+## Read Status
+
+Notifications track their read status in two ways:
+
+1. **isRead** boolean flag: Quick check if notification has been read
+2. **readAt** timestamp: Exact time when notification was marked as read
+
+To mark a notification as read, update both fields:
+- Set `isRead` to `true`
+- Set `readAt` to the current timestamp
+
+## Related Entities
+
+Notifications can be linked to various entity types:
+
+- **TripBooking**: Booking-related notifications
+- **ChatMessage**: Message notifications
+- **Review**: Review-related notifications
+- **User**: User profile notifications
+- **Tour**: Tour-related notifications
+
+Use `relatedEntityType` and `relatedEntityId` to associate notifications with specific entities, enabling users to navigate directly to the relevant content.
+
+## Related Endpoints
+
+- [Chat Messages](/api/chat-messages) - Messages that may trigger notifications
+- [Trip Bookings](/api/trip-bookings) - Bookings that generate notifications

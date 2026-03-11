@@ -1,0 +1,200 @@
+---
+title: "Reviews"
+description: "Manage tour reviews from tourists"
+---
+
+## Create Review
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.kinconecta.com/api/reviews \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tripId": 123,
+    "tourId": 456,
+    "guideId": 789,
+    "touristId": 101,
+    "rating": 5,
+    "comment": "Amazing tour! The guide was very knowledgeable and friendly.",
+    "likesCount": 0,
+    "repliesCount": 0
+  }'
+```
+</CodeGroup>
+
+Create a new review for a tour.
+
+### Request Body
+
+<ParamField body="tripId" type="integer" required>
+  ID of the trip booking being reviewed
+</ParamField>
+
+<ParamField body="tourId" type="integer" required>
+  ID of the tour being reviewed
+</ParamField>
+
+<ParamField body="guideId" type="integer" required>
+  ID of the guide being reviewed
+</ParamField>
+
+<ParamField body="touristId" type="integer" required>
+  ID of the tourist submitting the review
+</ParamField>
+
+<ParamField body="rating" type="integer" required>
+  Rating from 1 to 5 stars
+</ParamField>
+
+<ParamField body="comment" type="string">
+  Review comment text
+</ParamField>
+
+<ParamField body="likesCount" type="integer">
+  Number of likes (default: 0)
+</ParamField>
+
+<ParamField body="repliesCount" type="integer">
+  Number of replies (default: 0)
+</ParamField>
+
+### Response
+
+<ResponseField name="reviewId" type="integer">
+  Unique identifier for the review
+</ResponseField>
+
+<ResponseField name="tripId" type="integer">
+  ID of the trip booking
+</ResponseField>
+
+<ResponseField name="tourId" type="integer">
+  ID of the tour
+</ResponseField>
+
+<ResponseField name="guideId" type="integer">
+  ID of the guide
+</ResponseField>
+
+<ResponseField name="touristId" type="integer">
+  ID of the tourist
+</ResponseField>
+
+<ResponseField name="rating" type="integer">
+  Rating value (1-5)
+</ResponseField>
+
+<ResponseField name="comment" type="string">
+  Review comment
+</ResponseField>
+
+<ResponseField name="likesCount" type="integer">
+  Number of likes
+</ResponseField>
+
+<ResponseField name="repliesCount" type="integer">
+  Number of replies
+</ResponseField>
+
+<ResponseField name="createdAt" type="datetime">
+  Timestamp when the review was created
+</ResponseField>
+
+<ResponseField name="updatedAt" type="datetime">
+  Timestamp when the review was last updated
+</ResponseField>
+
+<ResponseField name="deletedAt" type="datetime">
+  Timestamp when the review was deleted (if applicable)
+</ResponseField>
+
+## Get All Reviews
+
+<CodeGroup>
+```bash cURL
+curl https://api.kinconecta.com/api/reviews
+```
+</CodeGroup>
+
+Retrieve all reviews in the system.
+
+### Response
+
+Returns an array of review objects with the same structure as the create review response.
+
+## Get Review by ID
+
+<CodeGroup>
+```bash cURL
+curl https://api.kinconecta.com/api/reviews/123
+```
+</CodeGroup>
+
+Retrieve a specific review by its ID.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The review ID
+</ParamField>
+
+### Response
+
+Returns a single review object.
+
+## Update Review
+
+<CodeGroup>
+```bash cURL
+curl -X PUT https://api.kinconecta.com/api/reviews/123 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "rating": 5,
+    "comment": "Updated review: Absolutely amazing experience!"
+  }'
+```
+</CodeGroup>
+
+Update an existing review.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The review ID
+</ParamField>
+
+### Request Body
+
+All fields from the create request are optional. Only provide the fields you want to update.
+
+<ParamField body="rating" type="integer">
+  Updated rating (1-5)
+</ParamField>
+
+<ParamField body="comment" type="string">
+  Updated comment text
+</ParamField>
+
+### Response
+
+Returns the updated review object.
+
+## Delete Review
+
+<CodeGroup>
+```bash cURL
+curl -X DELETE https://api.kinconecta.com/api/reviews/123
+```
+</CodeGroup>
+
+Delete a review by its ID.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The review ID
+</ParamField>
+
+### Response
+
+Returns 204 No Content on successful deletion.

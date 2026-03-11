@@ -1,0 +1,215 @@
+---
+title: User Profiles
+description: Comprehensive profile management for tourists and guides in Kin Conecta
+---
+
+Kin Conecta offers rich profile features tailored to both tourists and guides, enabling meaningful connections and personalized experiences.
+
+## Tourist Profiles
+
+Tourist profiles help travelers showcase their preferences and connect with compatible guides.
+
+### Profile Information
+
+<CardGroup cols={2}>
+  <Card title="Personal Details" icon="user">
+    Manage location, bio, avatar, and cover images to create an attractive profile
+  </Card>
+  <Card title="Travel Preferences" icon="compass">
+    Define travel style, trip type, pace preferences, and activity levels
+  </Card>
+  <Card title="Interests & Languages" icon="language">
+    Add interests and languages to improve matching with guides
+  </Card>
+  <Card title="Badges & Recognition" icon="award">
+    Earn badges based on membership status and platform activity
+  </Card>
+</CardGroup>
+
+### Key Fields
+
+The `TouristProfile` model includes:
+
+- **Basic Info**: Location, bio, member since date, avatar/cover URLs
+- **Travel Style**: Travel style, trip type, pace and company preferences
+- **Activity Level**: Enum values for activity intensity (`LOW`, `MODERATE`, `HIGH`, `VERY_HIGH`)
+- **Planning Level**: Enum values for planning preferences (`SPONTANEOUS`, `FLEXIBLE`, `STRUCTURED`, `VERY_PLANNED`)
+- **Preferences**: Group size, dietary preferences, amenities, transport options
+- **Accessibility**: Accessibility requirements and additional notes
+- **Photos**: Photo taking preferences
+
+<Note>
+Tourist profiles are linked to user accounts via `user_id` and stored in the `tourist_profiles` table.
+</Note>
+
+### Managing Interests
+
+Tourists can add multiple interests to their profile:
+
+```java
+// Model: TouristProfileInterest.java
+// Links tourists to interests via composite key
+@EmbeddedId
+private TouristProfileInterestId id;
+```
+
+Interests are managed through:
+- `InterestController.java` - CRUD operations for interest categories
+- `TouristProfileInterestController.java` - Link/unlink interests to profiles
+
+### Language Support
+
+Tourists can specify languages they speak:
+
+```java
+// Model: TouristProfileLanguage.java
+// Composite key linking user_id + language_code
+@EmbeddedId
+private TouristProfileLanguageId id;
+```
+
+Managed via `TouristProfileLanguageController.java` for adding/removing languages.
+
+## Guide Profiles
+
+Guide profiles are more comprehensive, showcasing expertise, availability, and professional credentials.
+
+### Profile Components
+
+<CardGroup cols={2}>
+  <Card title="Professional Info" icon="briefcase">
+    Summary, story, hourly rate, experience level, and tour style
+  </Card>
+  <Card title="Ratings & Reviews" icon="star">
+    Average rating and review count displayed prominently
+  </Card>
+  <Card title="Expertise Areas" icon="graduation-cap">
+    Multiple expertise areas to attract relevant tourists
+  </Card>
+  <Card title="Certifications" icon="certificate">
+    Display professional certifications and credentials
+  </Card>
+</CardGroup>
+
+### Key Fields
+
+The `GuideProfile` model includes:
+
+- **Profile Content**: Summary, story, status text, avatar/cover URLs
+- **Pricing**: Hourly rate and currency
+- **Reputation**: Average rating (`rating_avg`) and reviews count
+- **Location**: Location label for guide's area of operation
+- **Experience**: Experience level and tour style
+- **Tour Details**: Group size preferences, tour intensity, transport offered
+- **Photo Style**: Photography style and approach
+- **Updates**: Post text, images, captions with publish timestamps
+
+<Note>
+Guide profiles track reputation metrics automatically through the review system.
+</Note>
+
+### Expertise Management
+
+Guides can add multiple expertise areas:
+
+```java
+// Model: GuideExpertiseArea.java
+// Defines categories like "History", "Food", "Nature", etc.
+```
+
+**Controllers:**
+- `GuideExpertiseAreaController.java` - Manage expertise categories
+- `GuideProfileExpertiseController.java` - Link expertise to guide profiles
+
+### Certifications
+
+Guides can add professional certifications:
+
+```java
+// Model: GuideCertification.java
+@Id
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+private Long certificationId;
+
+private Long userId;
+private String name;
+```
+
+Managed via `GuideCertificationController.java` at:
+```
+/api/v1/guide-certifications
+```
+
+### Languages & Adaptations
+
+Guides specify:
+- **Languages**: Managed via `GuideProfileLanguageController.java`
+- **Adaptations**: Special accommodations offered (e.g., wheelchair accessible) via `GuideAdaptationController.java`
+
+### Availability Calendar
+
+Guides manage availability through calendar events:
+
+```java
+// Model: GuideCalendarEvent.java
+enum EventType { AVAILABLE, BLOCKED, BOOKING }
+enum Status { PENDING, CONFIRMED, CANCELLED }
+enum Source { MANUAL, BOOKING, SYSTEM }
+```
+
+The calendar system at `GuideCalendarEventController.java` tracks:
+- Start and end datetime
+- Event type and status
+- Source (manual entry, booking, or system-generated)
+
+### Location Management
+
+Guides can define multiple service locations:
+
+```java
+// Model: GuideLocation.java
+// Controller: GuideLocationController.java
+```
+
+## API Endpoints
+
+### Tourist Profile
+
+```
+GET    /api/v1/tourist-profiles/{id}
+POST   /api/v1/tourist-profiles
+PUT    /api/v1/tourist-profiles/{id}
+DELETE /api/v1/tourist-profiles/{id}
+```
+
+### Guide Profile
+
+```
+GET    /api/v1/guide-profiles/{id}
+POST   /api/v1/guide-profiles
+PUT    /api/v1/guide-profiles/{id}
+DELETE /api/v1/guide-profiles/{id}
+```
+
+<Accordion title="What's the difference between tourist and guide profiles?">
+  Tourist profiles focus on preferences, interests, and travel style to help match with guides. Guide profiles are professional portfolios showcasing expertise, certifications, availability, and pricing information.
+</Accordion>
+
+<Accordion title="Can users have both tourist and guide profiles?">
+  Yes, users can have both profile types linked to their user account, allowing them to both book tours as tourists and offer tours as guides.
+</Accordion>
+
+<Accordion title="How are profile images stored?">
+  Profile images are stored via URLs in `avatar_url` and `cover_url` fields. The actual file storage and upload handling is managed separately from the profile data.
+</Accordion>
+
+## Related Features
+
+<CardGroup cols={2}>
+  <Card title="Compatibility Matching" icon="heart" href="/features/compatibility-matching">
+    Learn how profiles power our matching algorithm
+  </Card>
+  <Card title="Reviews & Ratings" icon="star" href="/features/reviews-ratings">
+    See how reviews update guide profile ratings
+  </Card>
+</CardGroup>

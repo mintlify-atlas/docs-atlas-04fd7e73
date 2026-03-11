@@ -1,0 +1,203 @@
+---
+title: "Income Transactions"
+description: "Manage guide income transactions and financial records"
+---
+
+## Create Income Transaction
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.kinconecta.com/api/income_transactions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "guideId": 789,
+    "tripId": 123,
+    "tourId": 456,
+    "txnType": "BOOKING_INCOME",
+    "amount": 150.00,
+    "sign": "CREDIT",
+    "status": "COMPLETED",
+    "description": "Payment for City Walking Tour",
+    "occurredAt": "2026-04-15T14:30:00"
+  }'
+```
+</CodeGroup>
+
+Create a new income transaction record for a guide.
+
+### Request Body
+
+<ParamField body="guideId" type="integer" required>
+  ID of the guide
+</ParamField>
+
+<ParamField body="tripId" type="integer">
+  ID of the trip booking (if applicable)
+</ParamField>
+
+<ParamField body="tourId" type="integer">
+  ID of the tour (if applicable)
+</ParamField>
+
+<ParamField body="txnType" type="enum" required>
+  Type of transaction
+  - `BOOKING_INCOME`: Income from tour booking
+  - `WITHDRAWAL`: Withdrawal of funds
+  - `REFUND`: Refund to tourist
+  - `ADJUSTMENT`: Manual adjustment
+</ParamField>
+
+<ParamField body="amount" type="decimal" required>
+  Transaction amount
+</ParamField>
+
+<ParamField body="sign" type="enum" required>
+  Transaction direction
+  - `CREDIT`: Money added to guide's balance
+  - `DEBIT`: Money deducted from guide's balance
+</ParamField>
+
+<ParamField body="status" type="enum" required>
+  Transaction status
+  - `PENDING`: Transaction is pending
+  - `COMPLETED`: Transaction is completed
+  - `FAILED`: Transaction failed
+  - `CANCELLED`: Transaction was cancelled
+</ParamField>
+
+<ParamField body="description" type="string">
+  Description of the transaction
+</ParamField>
+
+<ParamField body="occurredAt" type="datetime" required>
+  Timestamp when the transaction occurred
+</ParamField>
+
+### Response
+
+<ResponseField name="transactionId" type="integer">
+  Unique identifier for the transaction
+</ResponseField>
+
+<ResponseField name="guideId" type="integer">
+  ID of the guide
+</ResponseField>
+
+<ResponseField name="tripId" type="integer">
+  ID of the trip booking
+</ResponseField>
+
+<ResponseField name="tourId" type="integer">
+  ID of the tour
+</ResponseField>
+
+<ResponseField name="txnType" type="enum">
+  Transaction type
+</ResponseField>
+
+<ResponseField name="amount" type="decimal">
+  Transaction amount
+</ResponseField>
+
+<ResponseField name="sign" type="enum">
+  Transaction direction (CREDIT, DEBIT)
+</ResponseField>
+
+<ResponseField name="status" type="enum">
+  Transaction status
+</ResponseField>
+
+<ResponseField name="description" type="string">
+  Transaction description
+</ResponseField>
+
+<ResponseField name="occurredAt" type="datetime">
+  When the transaction occurred
+</ResponseField>
+
+<ResponseField name="createdAt" type="datetime">
+  When the record was created
+</ResponseField>
+
+## Get All Income Transactions
+
+<CodeGroup>
+```bash cURL
+curl https://api.kinconecta.com/api/income_transactions
+```
+</CodeGroup>
+
+Retrieve all income transactions in the system.
+
+### Response
+
+Returns an array of income transaction objects.
+
+## Get Income Transaction by ID
+
+<CodeGroup>
+```bash cURL
+curl https://api.kinconecta.com/api/income_transactions/123
+```
+</CodeGroup>
+
+Retrieve a specific income transaction by its ID.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The transaction ID
+</ParamField>
+
+### Response
+
+Returns a single income transaction object.
+
+## Update Income Transaction
+
+<CodeGroup>
+```bash cURL
+curl -X PUT https://api.kinconecta.com/api/income_transactions/123 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "status": "COMPLETED",
+    "description": "Updated: Payment processed successfully"
+  }'
+```
+</CodeGroup>
+
+Update an existing income transaction.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The transaction ID
+</ParamField>
+
+### Request Body
+
+All fields from the create request are optional. Only provide the fields you want to update.
+
+### Response
+
+Returns the updated income transaction object.
+
+## Delete Income Transaction
+
+<CodeGroup>
+```bash cURL
+curl -X DELETE https://api.kinconecta.com/api/income_transactions/123
+```
+</CodeGroup>
+
+Delete an income transaction by its ID.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The transaction ID
+</ParamField>
+
+### Response
+
+Returns 204 No Content on successful deletion.

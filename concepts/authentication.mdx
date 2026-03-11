@@ -1,0 +1,416 @@
+---
+title: 'Authentication'
+description: 'Understanding the authentication system, session management, and security model in Kin Conecta'
+---
+
+## Overview
+
+Kin Conecta implements a session-based authentication system that securely manages user access across the platform. The system handles user registration, login, session management, and password security using industry-standard practices.
+
+## Authentication Architecture
+
+The authentication system operates on three core components:
+
+<CardGroup cols={3}>
+  <Card title="User Accounts" icon="user">
+    Base user entities with credentials and account status
+  </Card>
+  <Card title="Auth Sessions" icon="clock">
+    Time-limited session tokens for authenticated access
+  </Card>
+  <Card title="Security Layer" icon="shield">
+    Password hashing and CORS configuration
+  </Card>
+</CardGroup>
+
+## User Account Model
+
+Authentication starts with the user entity:
+
+```java
+@Entity
+@Table(name = "users")
+public class User {
+    private Long userId;
+    private UserRole role;              // TOURIST, GUIDE, ADMIN
+    private String fullName;
+    private String email;               // Unique identifier for login
+    private String passwordHash;        // BCrypt hashed password
+    private UserAccountStatus accountStatus;
+    private LocalDateTime emailVerifiedAt;
+    private LocalDateTime lastLoginAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+}
+```
+
+### Account Status States
+
+```java
+public enum UserAccountStatus {
+    PENDING,    // Registration complete, email verification pending
+    ACTIVE,     // Fully activated account
+    SUSPENDED,  // Temporarily disabled by admin
+    DELETED     // Soft-deleted account
+}
+```
+
+<Accordion title="Account Status Transitions">
+  **Valid State Flows:**
+  
+  - **PENDING → ACTIVE**: User verifies email address
+  - **ACTIVE → SUSPENDED**: Admin action for policy violation
+  - **SUSPENDED → ACTIVE**: Admin reinstates account
+  - **ACTIVE → DELETED**: User or admin deletes account
+  - **PENDING → DELETED**: Unverified account cleanup
+  
+  <Info>
+    Only `ACTIVE` accounts can authenticate and access platform features.
+  </Info>
+</Accordion>
+
+## Session-Based Authentication
+
+Kin Conecta uses server-side session management for secure authentication:
+
+```java
+@Entity
+@Table(name = "auth_sessions")
+public class AuthSession {
+    private Long sessionId;
+    private Long userId;
+    private String tokenHash;          // Hashed session token
+    private LocalDateTime expiresAt;   // Session expiration timestamp
+    private LocalDateTime revokedAt;   // Manual revocation timestamp
+    private String ip;                 // Client IP address
+    private String userAgent;          // Browser/client information
+    private LocalDateTime createdAt;
+}
+```
+
+### Session Lifecycle
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant S as Server
+    participant DB as Database
+    
+    C->>S: POST /api/auth/login<br/>{email, password}
+    S->>DB: Verify credentials
+    DB-->>S: User found
+    S->>S: Generate session token
+    S->>S: Hash token
+    S->>DB: Store AuthSession
+    S->>S: Update lastLoginAt
+    S-->>C: Return token
+    Note over C: Store token securely
+    
+    C->>S: API Request<br/>Authorization: Bearer {token}
+    S->>S: Hash incoming token
+    S->>DB: Validate session
+    DB-->>S: Session valid
+    S->>S: Check expiresAt
+    S->>S: Check revokedAt
+    S-->>C: Authorized response
+    
+    C->>S: POST /api/auth/logout
+    S->>DB: Set revokedAt = now()
+    S-->>C: Logout success
+```
+
+### Session Properties
+
+<CardGroup cols={2}>
+  <Card title="Token Hash" icon="hashtag">
+    Session tokens are hashed using BCrypt before storage. The plaintext token is never saved, preventing token exposure in case of database breach.
+  </Card>
+  <Card title="Expiration" icon="hourglass-end">
+    Sessions have a defined lifetime (typically 7-30 days). Expired sessions are automatically invalid regardless of token validity.
+  </Card>
+  <Card title="Revocation" icon="ban">
+    Sessions can be manually revoked through logout or admin action. The `revokedAt` timestamp marks explicit session termination.
+  </Card>
+  <Card title="Tracking" icon="location-dot">
+    IP address and user agent tracking enables security monitoring and detection of suspicious access patterns.
+  </Card>
+</CardGroup>
+
+## Password Security
+
+The system implements robust password handling:
+
+### Password Hashing
+
+```java
+@Configuration
+public class SecurityConfiguration {
+    
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}
+```
+
+**BCrypt Properties:**
+- **Adaptive**: Computational cost can be increased as hardware improves
+- **Salted**: Each password gets a unique salt, preventing rainbow table attacks
+- **One-Way**: Cannot be reversed - only compared
+
+<Note>
+  Passwords are hashed with BCrypt during registration and never stored in plaintext. Authentication compares hashed values using BCrypt's built-in comparison method.
+</Note>
+
+### Password Requirements
+
+While not enforced at the database level, best practices recommend:
+
+- Minimum 8 characters
+- At least one uppercase letter
+- At least one lowercase letter
+- At least one number
+- At least one special character
+
+### Password Reset Flow
+
+```mermaid
+flowchart TD
+    A[User Requests Reset] --> B[Generate Reset Token]
+    B --> C[Send Email with Token]
+    C --> D[User Clicks Link]
+    D --> E{Token Valid?}
+    E -->|Yes| F[Show Reset Form]
+    E -->|No| G[Show Error]
+    F --> H[Submit New Password]
+    H --> I[Hash New Password]
+    I --> J[Update passwordHash]
+    J --> K[Invalidate Reset Token]
+    K --> L[Revoke Existing Sessions]
+    L --> M[Force Re-Login]
+```
+
+<Info>
+  Password resets should invalidate all existing sessions for security, forcing the user to log in again with the new password.
+</Info>
+
+## Security Configuration
+
+The platform uses Spring Security for authentication enforcement:
+
+```java
+@Configuration
+@EnableWebSecurity
+public class SecurityConfiguration {
+    
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) 
+            throws Exception {
+        httpSecurity.authorizeHttpRequests(
+            auth -> auth
+                .requestMatchers("/api/**").permitAll()
+                .anyRequest().permitAll()
+        ).csrf(csrf -> csrf.disable());
+        return httpSecurity.build();
+    }
+}
+```
+
+<Accordion title="Security Configuration Details">
+  **Current Configuration:**
+  - All API endpoints are currently open (`permitAll()`)
+  - CSRF protection is disabled for API-first architecture
+  - CORS is configured separately for cross-origin access
+  
+  **Production Recommendations:**
+  - Restrict endpoints to authenticated users
+  - Implement role-based authorization
+  - Enable HTTPS-only cookies
+  - Add rate limiting for authentication endpoints
+  - Implement account lockout after failed attempts
+</Accordion>
+
+## CORS Configuration
+
+Cross-Origin Resource Sharing allows web clients to access the API:
+
+```java
+@Bean
+public WebMvcConfigurer corsConfigure() {
+    return new WebMvcConfigurer() {
+        public void addCorsMappings(CorsRegistry registry) {
+            registry.addMapping("/**")
+                    .allowedOrigins("*")
+                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                    .allowedHeaders("*");
+        }
+    };
+}
+```
+
+<Note>
+  Production deployments should restrict `allowedOrigins` to specific frontend domains rather than using the wildcard `"*"` for enhanced security.
+</Note>
+
+## Email Verification
+
+New accounts must verify their email before full activation:
+
+```java
+private LocalDateTime emailVerifiedAt; // NULL until verified
+```
+
+**Verification Flow:**
+
+1. User registers with email and password
+2. Account created with status `PENDING`
+3. Verification email sent with unique token
+4. User clicks verification link
+5. Token validated and `emailVerifiedAt` set to current timestamp
+6. Account status updated to `ACTIVE`
+
+<Info>
+  Verified emails (`emailVerifiedAt != NULL`) serve as a trust signal and are required for certain platform actions like booking tours or receiving payments.
+</Info>
+
+## Multi-Session Management
+
+Users can have multiple active sessions simultaneously:
+
+```sql
+SELECT * FROM auth_sessions 
+WHERE user_id = ? 
+  AND revoked_at IS NULL 
+  AND expires_at > NOW();
+```
+
+This enables:
+- Login from multiple devices (phone, tablet, laptop)
+- Multiple browser sessions
+- Background API access (mobile apps)
+
+**Session Management Features:**
+- View all active sessions
+- Revoke specific sessions ("Log out from other devices")
+- Revoke all sessions ("Log out everywhere")
+
+## API Authentication Flow
+
+Clients authenticate API requests using Bearer tokens:
+
+```http
+GET /api/tours/123 HTTP/1.1
+Host: api.kinconecta.com
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
+```
+
+### Authentication Middleware
+
+The server validates tokens on each request:
+
+1. Extract token from `Authorization` header
+2. Hash the token using BCrypt comparison
+3. Query `auth_sessions` for matching `tokenHash`
+4. Verify session is not expired (`expiresAt > now()`)
+5. Verify session is not revoked (`revokedAt IS NULL`)
+6. Load associated user and verify status is `ACTIVE`
+7. Attach user context to request for downstream processing
+
+<Accordion title="Error Responses">
+  **401 Unauthorized:**
+  - Missing Authorization header
+  - Invalid token format
+  - Token not found in database
+  - Session expired
+  - Session revoked
+  - User account suspended or deleted
+  
+  **403 Forbidden:**
+  - Valid authentication but insufficient permissions for the resource
+  - Role-based access denial
+</Accordion>
+
+## Login Rate Limiting
+
+<Note>
+  Implement rate limiting on authentication endpoints to prevent brute force attacks:
+  
+  - Max 5 failed login attempts per email per 15 minutes
+  - Max 20 login attempts per IP per hour
+  - Temporary lockout after threshold exceeded
+</Note>
+
+## Session Security Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Secure Token Generation" icon="key">
+    Use cryptographically secure random token generation (minimum 256 bits of entropy).
+  </Card>
+  <Card title="HTTPS Only" icon="lock">
+    Transmit tokens only over HTTPS in production to prevent interception.
+  </Card>
+  <Card title="HttpOnly Cookies" icon="cookie">
+    If using cookies, set HttpOnly flag to prevent JavaScript access and XSS attacks.
+  </Card>
+  <Card title="Short Expiration" icon="timer">
+    Balance security and UX with reasonable session durations (7-30 days).
+  </Card>
+  <Card title="Refresh Tokens" icon="rotate">
+    Implement refresh token pattern for long-lived mobile app sessions.
+  </Card>
+  <Card title="Session Monitoring" icon="eye">
+    Track suspicious patterns like rapid session creation or unusual IP changes.
+  </Card>
+</CardGroup>
+
+## Role-Based Authorization
+
+Authentication verifies identity; authorization controls access:
+
+```java
+public enum UserRole {
+    TOURIST,  // Can book tours, review guides
+    GUIDE,    // Can create tours, accept bookings
+    ADMIN     // Can manage users, moderate content
+}
+```
+
+After authentication, the user's `role` determines:
+- Available API endpoints
+- Permitted actions on resources
+- Visible data scopes
+
+**Example Authorization Rules:**
+- Only `GUIDE` can create tours
+- Only `TOURIST` can book tours
+- Only booking participants can access booking details
+- Only `ADMIN` can suspend accounts
+
+## OAuth and Social Login
+
+<Info>
+  Future Enhancement: Consider integrating OAuth providers (Google, Facebook, Apple) for simplified registration and reduced password management burden.
+</Info>
+
+**Benefits:**
+- Faster registration flow
+- Reduced password reset requests
+- Verified email addresses
+- Enhanced trust through social profiles
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="User Roles" icon="users" href="/concepts/user-roles">
+    Understand user roles and profile types
+  </Card>
+  <Card title="API - Authentication" icon="code" href="/api/authentication">
+    Explore authentication API endpoints
+  </Card>
+  <Card title="API - Users" icon="user-gear" href="/api/users">
+    View user management APIs
+  </Card>
+  <Card title="Tourist Guide" icon="plane" href="/guides/tourist-guide">
+    Learn how to use the platform as a tourist
+  </Card>
+</CardGroup>

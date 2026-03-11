@@ -1,0 +1,199 @@
+---
+title: Languages
+description: Manage supported languages for the platform
+---
+
+## Overview
+
+The Languages API manages the list of supported languages across the Kin Conecta platform. Languages are referenced by users for their preferred interface language and by guides and tourists for communication capabilities.
+
+## Language Object
+
+The Language object represents a supported language:
+
+<ResponseField name="languageCode" type="string">
+  ISO 639-1 language code (2-letter code, e.g., "en", "es", "fr")
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Human-readable language name (e.g., "English", "Spanish", "French")
+</ResponseField>
+
+## Create Language
+
+<CodeGroup>
+```bash cURL
+curl -X POST http://localhost:8080/api/languages \
+  -H "Content-Type: application/json" \
+  -d '{
+    "languageCode": "es",
+    "name": "Spanish"
+  }'
+```
+</CodeGroup>
+
+Adds a new language to the platform.
+
+<ParamField path="languageCode" type="string" required>
+  ISO 639-1 two-letter language code (primary key)
+</ParamField>
+
+<ParamField path="name" type="string" required>
+  Human-readable language name
+</ParamField>
+
+### Response
+
+```json
+{
+  "languageCode": "es",
+  "name": "Spanish"
+}
+```
+
+## Get All Languages
+
+<CodeGroup>
+```bash cURL
+curl -X GET http://localhost:8080/api/languages
+```
+</CodeGroup>
+
+Retrieves all supported languages in the platform.
+
+### Response
+
+```json
+[
+  {
+    "languageCode": "en",
+    "name": "English"
+  },
+  {
+    "languageCode": "es",
+    "name": "Spanish"
+  },
+  {
+    "languageCode": "fr",
+    "name": "French"
+  },
+  {
+    "languageCode": "de",
+    "name": "German"
+  },
+  {
+    "languageCode": "it",
+    "name": "Italian"
+  },
+  {
+    "languageCode": "pt",
+    "name": "Portuguese"
+  },
+  {
+    "languageCode": "zh",
+    "name": "Chinese"
+  },
+  {
+    "languageCode": "ja",
+    "name": "Japanese"
+  },
+  {
+    "languageCode": "ko",
+    "name": "Korean"
+  },
+  {
+    "languageCode": "ru",
+    "name": "Russian"
+  }
+]
+```
+
+## Get Language by Code
+
+<CodeGroup>
+```bash cURL
+curl -X GET http://localhost:8080/api/languages/es
+```
+</CodeGroup>
+
+Retrieves a specific language by its language code.
+
+### Response
+
+```json
+{
+  "languageCode": "es",
+  "name": "Spanish"
+}
+```
+
+## Update Language
+
+<CodeGroup>
+```bash cURL
+curl -X PUT http://localhost:8080/api/languages/es \
+  -H "Content-Type: application/json" \
+  -d '{
+    "languageCode": "es",
+    "name": "Español"
+  }'
+```
+</CodeGroup>
+
+Updates an existing language's name or details.
+
+### Response
+
+```json
+{
+  "languageCode": "es",
+  "name": "Español"
+}
+```
+
+## Delete Language
+
+<CodeGroup>
+```bash cURL
+curl -X DELETE http://localhost:8080/api/languages/es
+```
+</CodeGroup>
+
+Removes a language from the platform. Note that this will fail if the language is currently referenced by any users or profiles.
+
+### Response
+
+```json
+{
+  "message": "Language deleted successfully"
+}
+```
+
+## Common Language Codes
+
+Here are some commonly used ISO 639-1 language codes:
+
+| Code | Language |
+|------|----------|
+| `en` | English |
+| `es` | Spanish |
+| `fr` | French |
+| `de` | German |
+| `it` | Italian |
+| `pt` | Portuguese |
+| `zh` | Chinese |
+| `ja` | Japanese |
+| `ko` | Korean |
+| `ru` | Russian |
+| `ar` | Arabic |
+| `hi` | Hindi |
+| `nl` | Dutch |
+| `sv` | Swedish |
+| `pl` | Polish |
+| `tr` | Turkish |
+
+## Related Endpoints
+
+- [Tourist Profile Languages](/api/tourist-profile-languages) - Associate languages with tourist profiles
+- [Guide Profile Languages](/api/guide-profile-languages) - Associate languages with guide profiles
+- [Users](/api/users) - User preferred language setting

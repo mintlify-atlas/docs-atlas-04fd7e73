@@ -1,0 +1,456 @@
+---
+title: Reviews & Ratings
+description: Complete review system for tourists to rate tours and guides to respond in Kin Conecta
+---
+
+Kin Conecta's review system enables tourists to share their experiences and helps future travelers make informed decisions.
+
+## Overview
+
+The review system consists of:
+
+<CardGroup cols={3}>
+  <Card title="Reviews" icon="star">
+    Tourist reviews with ratings and comments
+  </Card>
+  <Card title="Review Replies" icon="reply">
+    Guide responses to reviews
+  </Card>
+  <Card title="Social Features" icon="heart">
+    Likes and engagement metrics
+  </Card>
+</CardGroup>
+
+## Reviews
+
+Reviews are feedback from tourists after completing a tour.
+
+### Data Model
+
+```java
+// Model: Review.java
+package org.generation.socialNetwork.reviews.model;
+
+@Entity
+@Table(name = "reviews")
+public class Review {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long reviewId;
+    
+    private Long tripId;      // The completed trip
+    private Long tourId;      // The tour that was reviewed
+    private Long guideId;     // The guide being reviewed
+    private Long touristId;   // Who wrote the review
+    
+    private Integer rating;   // Numeric rating (typically 1-5)
+    private String comment;   // Written review text
+    
+    private Integer likesCount;   // Number of likes
+    private Integer repliesCount; // Number of replies
+    
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime deletedAt;  // Soft delete support
+}
+```
+
+### Key Features
+
+<CardGroup cols={2}>
+  <Card title="Trip Association" icon="link">
+    Reviews are linked to specific completed trips
+  </Card>
+  <Card title="Rating Scale" icon="star-half-stroke">
+    Numeric rating system (typically 1-5 stars)
+  </Card>
+  <Card title="Text Feedback" icon="comment">
+    Detailed written comments from tourists
+  </Card>
+  <Card title="Soft Deletes" icon="trash-can">
+    Reviews can be removed but data is preserved
+  </Card>
+</CardGroup>
+
+### Rating System
+
+While the database stores ratings as integers, the typical implementation uses a 5-star scale:
+
+- 5 stars - Excellent
+- 4 stars - Good
+- 3 stars - Average
+- 2 stars - Below Average
+- 1 star - Poor
+
+<Note>
+The `rating` field is flexible and can support different scales (e.g., 1-10) if needed.
+</Note>
+
+### Social Engagement
+
+**Likes**: Other users can like reviews they find helpful
+- Stored in `likesCount` field
+- Helps surface useful reviews
+
+**Replies**: Counted in `repliesCount` field
+- Shows how engaged the guide is with feedback
+- Includes guide replies and potentially tourist responses
+
+### Soft Deletion
+
+Reviews use soft deletion for moderation:
+
+```java
+private LocalDateTime deletedAt;  // null = active, non-null = deleted
+```
+
+**Benefits:**
+- Preserve rating calculations
+- Maintain referential integrity
+- Allow restoration if deleted in error
+- Support moderation workflows
+
+<Tip>
+When querying reviews, filter for `deletedAt IS NULL` to show only active reviews.
+</Tip>
+
+## Review Replies
+
+Guides can respond to reviews to address feedback or thank tourists.
+
+### Data Model
+
+```java
+// Model: ReviewReply.java
+@Entity
+@Table(name = "review_replies")
+public class ReviewReply {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long replyId;
+    
+    private Long reviewId;    // Parent review
+    private Long guideId;     // Who replied (typically the guide)
+    
+    private String message;   // Reply content
+    
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+}
+```
+
+### Key Features
+
+- **One-to-Many**: Multiple replies can exist per review
+- **Guide Ownership**: Typically only guides reply to their reviews
+- **Timestamps**: Track when replies are created and edited
+- **Updates**: Guides can edit their replies
+
+<Info>
+Showing that a guide responds to reviews builds trust and demonstrates active engagement with customers.
+</Info>
+
+### Best Practices for Replies
+
+<CardGroup cols={2}>
+  <Card title="Timely Response" icon="clock">
+    Reply to reviews within 24-48 hours
+  </Card>
+  <Card title="Professional Tone" icon="user-tie">
+    Maintain professional, courteous language
+  </Card>
+  <Card title="Address Concerns" icon="circle-exclamation">
+    Acknowledge negative feedback constructively
+  </Card>
+  <Card title="Thank Positive Reviews" icon="heart">
+    Show appreciation for good reviews
+  </Card>
+</CardGroup>
+
+## Integration with Other Features
+
+### Impact on Guide Profiles
+
+Reviews automatically update guide statistics:
+
+```java
+// GuideProfile.java
+private BigDecimal ratingAvg;     // Average of all review ratings
+private Integer reviewsCount;     // Total number of reviews
+```
+
+**Calculation:**
+```sql
+-- Calculate average rating
+SELECT AVG(rating) as rating_avg, COUNT(*) as reviews_count
+FROM reviews
+WHERE guide_id = ? AND deleted_at IS NULL
+```
+
+### Impact on Tour Listings
+
+Tours also display aggregated ratings:
+
+```java
+// Tour.java
+private BigDecimal ratingAvg;     // Average rating for this tour
+private Integer bookingsCount;    // Total bookings (includes reviews)
+```
+
+### Review Eligibility
+
+Tourists can only review trips that:
+
+1. Have `status = COMPLETED`
+2. They participated in (`touristId` matches)
+3. Haven't already been reviewed by them
+
+<Warning>
+**Prevent duplicate reviews**: Check if a review already exists for the trip+tourist combination before allowing a new review.
+</Warning>
+
+## API Endpoints
+
+### Reviews
+
+```
+GET    /api/v1/reviews
+GET    /api/v1/reviews/{id}
+POST   /api/v1/reviews
+PUT    /api/v1/reviews/{id}
+DELETE /api/v1/reviews/{id}
+```
+
+**Common Query Parameters:**
+- `?guideId={id}` - Get reviews for a guide
+- `?tourId={id}` - Get reviews for a tour
+- `?touristId={id}` - Get reviews by a tourist
+- `?tripId={id}` - Get review for a specific trip
+- `?minRating={n}` - Filter by minimum rating
+
+### Review Replies
+
+```
+GET    /api/v1/review-replies
+GET    /api/v1/review-replies/{id}
+POST   /api/v1/review-replies
+PUT    /api/v1/review-replies/{id}
+DELETE /api/v1/review-replies/{id}
+```
+
+**Common Query Parameters:**
+- `?reviewId={id}` - Get replies for a review
+- `?guideId={id}` - Get all replies by a guide
+
+## Usage Examples
+
+### Creating a Review
+
+```json
+POST /api/v1/reviews
+{
+  "tripId": 789,
+  "tourId": 42,
+  "guideId": 456,
+  "touristId": 123,
+  "rating": 5,
+  "comment": "Amazing experience! The guide was knowledgeable and friendly. Highly recommend this tour!",
+  "createdAt": "2024-06-16T10:00:00Z"
+}
+```
+
+### Guide Replying to Review
+
+```json
+POST /api/v1/review-replies
+{
+  "reviewId": 555,
+  "guideId": 456,
+  "message": "Thank you so much for the wonderful review! It was a pleasure showing you around Tokyo. Hope to see you again soon!",
+  "createdAt": "2024-06-16T15:30:00Z"
+}
+
+// Update review reply count
+PUT /api/v1/reviews/555
+{
+  "repliesCount": 1
+}
+```
+
+### Updating Guide Rating Average
+
+```sql
+-- Calculate new average after review is created
+UPDATE guide_profiles
+SET rating_avg = (
+  SELECT AVG(rating)
+  FROM reviews
+  WHERE guide_id = 456 AND deleted_at IS NULL
+),
+reviews_count = (
+  SELECT COUNT(*)
+  FROM reviews
+  WHERE guide_id = 456 AND deleted_at IS NULL
+)
+WHERE user_id = 456;
+```
+
+### Soft Deleting a Review
+
+```json
+PUT /api/v1/reviews/555
+{
+  "deletedAt": "2024-06-20T09:00:00Z"
+}
+
+// Recalculate guide ratings after deletion
+```
+
+## Review Display & Sorting
+
+### Common Sorting Options
+
+<CardGroup cols={2}>
+  <Card title="Most Recent" icon="clock">
+    Sort by `createdAt DESC`
+  </Card>
+  <Card title="Highest Rated" icon="star">
+    Sort by `rating DESC`
+  </Card>
+  <Card title="Most Helpful" icon="thumbs-up">
+    Sort by `likesCount DESC`
+  </Card>
+  <Card title="With Replies" icon="reply">
+    Sort by `repliesCount DESC`
+  </Card>
+</CardGroup>
+
+### Review Filtering
+
+Common filters for review lists:
+
+```javascript
+// Show only 5-star reviews
+GET /api/v1/reviews?guideId=456&rating=5
+
+// Show reviews with photos (if implemented)
+GET /api/v1/reviews?guideId=456&hasPhotos=true
+
+// Show verified reviews (from completed trips)
+GET /api/v1/reviews?guideId=456&verified=true
+```
+
+## Moderation & Quality
+
+### Review Guidelines
+
+Reviews should:
+- Be based on actual experience
+- Be respectful and constructive
+- Avoid profanity or hate speech
+- Not include personal contact information
+- Not be spam or promotional content
+
+### Moderation Actions
+
+<Accordion title="Flagging Reviews">
+  Users can flag inappropriate reviews for moderator review. Flagged reviews are reviewed by platform administrators.
+</Accordion>
+
+<Accordion title="Soft Deletion">
+  Moderators can soft delete reviews that violate guidelines by setting `deletedAt` timestamp.
+</Accordion>
+
+<Accordion title="Editing Reviews">
+  Tourists can edit their reviews within a time window (e.g., 7 days). The `updatedAt` timestamp tracks edits.
+</Accordion>
+
+## Review Verification
+
+Verified reviews come from actual completed bookings:
+
+```javascript
+// Check if review is verified
+const isVerified = review.tripId && 
+  tripBooking.status === 'COMPLETED' &&
+  tripBooking.touristId === review.touristId;
+```
+
+<Info>
+Verified reviews are more trustworthy and can be highlighted in the UI with a verification badge.
+</Info>
+
+## Analytics & Insights
+
+### For Guides
+
+Guides can track:
+
+- **Average Rating**: Overall rating average
+- **Rating Distribution**: Count of 1-5 star reviews
+- **Response Rate**: Percentage of reviews with guide replies
+- **Review Trends**: Rating changes over time
+- **Common Themes**: Frequently mentioned topics
+
+### For Platform
+
+Platform administrators can monitor:
+
+- **Overall Rating Distribution**: Platform-wide quality metrics
+- **Top Rated Guides**: Identify and promote excellent guides
+- **Problem Detection**: Identify guides with declining ratings
+- **Review Volume**: Track engagement and platform health
+
+## Best Practices
+
+<Tip>
+**Prompt for reviews** shortly after trip completion while the experience is fresh. Send a notification or email 1-2 days after the trip ends.
+</Tip>
+
+<Warning>
+**Prevent review manipulation**: Only allow verified tourists who completed a trip to leave reviews. Prevent guides from reviewing themselves.
+</Warning>
+
+<Info>
+**Display reviews prominently** on guide and tour pages to help tourists make informed decisions. Include average rating, total reviews, and recent reviews.
+</Info>
+
+### Review Incentives
+
+- Badge or points for tourists who leave reviews
+- Highlight helpful reviews with likes
+- Feature detailed, photo-rich reviews
+- Thank tourists for feedback
+
+## Common Questions
+
+<Accordion title="Can tourists edit their reviews?">
+  Yes, tourists can update their reviews using the `PUT /api/v1/reviews/{id}` endpoint. The `updatedAt` timestamp records when the review was last modified.
+</Accordion>
+
+<Accordion title="Can guides delete negative reviews?">
+  No, guides cannot delete reviews. Only platform administrators can remove reviews that violate community guidelines. This maintains review authenticity.
+</Accordion>
+
+<Accordion title="How is the guide rating calculated?">
+  The guide's `rating_avg` is calculated as the average of all non-deleted review ratings. It's automatically updated when reviews are created, edited, or deleted.
+</Accordion>
+
+<Accordion title="Can tourists review a guide without booking a tour?">
+  No, reviews require a `tripId` linking to a completed trip. This ensures all reviews are from verified experiences.
+</Accordion>
+
+<Accordion title="What happens to reviews if a guide deletes their account?">
+  Reviews are typically preserved for historical accuracy and transparency, but marked appropriately if the guide is no longer active.
+</Accordion>
+
+## Related Features
+
+<CardGroup cols={2}>
+  <Card title="Trip Bookings" icon="calendar-check" href="/features/bookings">
+    Learn how completed trips enable reviews
+  </Card>
+  <Card title="Guide Profiles" icon="user-tie" href="/features/profiles">
+    See how ratings appear on guide profiles
+  </Card>
+</CardGroup>

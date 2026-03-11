@@ -1,0 +1,403 @@
+---
+title: 'Backend Deployment'
+description: 'Deploy and run the Spring Boot backend server'
+icon: 'server'
+---
+
+## Overview
+
+The Kin Conecta backend is built with Spring Boot 4.0.3 and Java 21. This guide covers running the backend locally for development and testing.
+
+## Prerequisites
+
+<CardGroup cols={2}>
+  <Card title="Java 21" icon="java">
+    JDK 21 or higher is required. The project uses Java 21 language features.
+  </Card>
+  <Card title="MySQL Database" icon="database">
+    MySQL 8+ must be running with the Kin Conecta schema created.
+  </Card>
+  <Card title="Gradle" icon="gear">
+    Gradle wrapper is included. No separate installation needed.
+  </Card>
+  <Card title="Application Config" icon="file-lines">
+    Database credentials must be configured in application.properties.
+  </Card>
+</CardGroup>
+
+## Verify Java Installation
+
+Before starting, verify Java 21 is installed:
+
+```bash
+java -version
+```
+
+Expected output:
+```
+java version "21.0.x"
+Java(TM) SE Runtime Environment
+```
+
+If Java 21 is not installed, download it from:
+- [Oracle JDK 21](https://www.oracle.com/java/technologies/downloads/#java21)
+- [OpenJDK 21](https://jdk.java.net/21/)
+
+## Running the Backend
+
+<Steps>
+  <Step title="Navigate to Backend Directory">
+    Open a terminal and navigate to the backend project directory:
+
+    ```bash
+    cd backendKC
+    ```
+  </Step>
+
+  <Step title="Configure Database Connection">
+    Ensure your `src/main/resources/application.properties` is properly configured.
+
+    See [Configuration Guide](/deployment/configuration) for details.
+  </Step>
+
+  <Step title="Start the Application">
+    Run the Spring Boot application using Gradle:
+
+    <CodeGroup>
+    ```bash Windows
+    .\gradlew.bat bootRun
+    ```
+
+    ```bash Linux/Mac
+    ./gradlew bootRun
+    ```
+    </CodeGroup>
+
+    The application will compile and start. You should see output similar to:
+
+    ```
+    2026-03-11 10:15:32.123  INFO --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http)
+    2026-03-11 10:15:32.130  INFO --- [           main] org.generation.KCv2Application          : Started KCv2Application in 5.234 seconds
+    ```
+  </Step>
+
+  <Step title="Verify the Server is Running">
+    The API is now available at:
+
+    ```
+    http://localhost:8080
+    ```
+
+    Test with a simple endpoint:
+
+    ```bash
+    curl http://localhost:8080/api/languages
+    ```
+  </Step>
+</Steps>
+
+## Build Configurations
+
+The project uses Gradle with the following key configurations:
+
+### Gradle Build File
+
+From `build.gradle`:
+
+```gradle
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '4.0.3'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+```
+
+### Key Dependencies
+
+- **Spring Boot Starter Data JPA** - Database access and ORM
+- **Spring Boot Starter WebMVC** - REST API framework  
+- **Spring Boot Starter Security** - Authentication and authorization
+- **MySQL Connector** - MySQL JDBC driver
+- **Lombok** - Reduces boilerplate code
+- **Spring Boot DevTools** - Hot reload during development
+
+## Available Gradle Commands
+
+<CodeGroup>
+```bash Run Application
+# Windows
+.\gradlew.bat bootRun
+
+# Linux/Mac
+./gradlew bootRun
+```
+
+```bash Build JAR
+# Windows
+.\gradlew.bat build
+
+# Linux/Mac
+./gradlew build
+```
+
+```bash Run Tests
+# Windows
+.\gradlew.bat test --no-daemon --console=plain
+
+# Linux/Mac  
+./gradlew test --no-daemon --console=plain
+```
+
+```bash Clean Build
+# Windows
+.\gradlew.bat clean build
+
+# Linux/Mac
+./gradlew clean build
+```
+</CodeGroup>
+
+## API Endpoints
+
+The backend exposes RESTful API endpoints for all resources. The system includes **195 CRUD routes across 39 controllers**.
+
+### Base URL
+
+```
+http://localhost:8080
+```
+
+### Example Endpoints
+
+<AccordionGroup>
+  <Accordion title="User Management">
+    ```bash
+    # Get all users
+    GET http://localhost:8080/api/users
+
+    # Get user by ID
+    GET http://localhost:8080/api/users/{id}
+
+    # Create user
+    POST http://localhost:8080/api/users
+
+    # Update user
+    PUT http://localhost:8080/api/users/{id}
+
+    # Delete user
+    DELETE http://localhost:8080/api/users/{id}
+    ```
+  </Accordion>
+
+  <Accordion title="Tours">
+    ```bash
+    # Get all tours
+    GET http://localhost:8080/api/tours
+
+    # Get tour by ID
+    GET http://localhost:8080/api/tours/{id}
+
+    # Create tour
+    POST http://localhost:8080/api/tours
+
+    # Update tour
+    PUT http://localhost:8080/api/tours/{id}
+
+    # Delete tour
+    DELETE http://localhost:8080/api/tours/{id}
+    ```
+  </Accordion>
+
+  <Accordion title="Languages">
+    ```bash
+    # Get all languages
+    GET http://localhost:8080/api/languages
+
+    # Create language
+    POST http://localhost:8080/api/languages
+    Content-Type: application/json
+    {
+      "languageCode": "es",
+      "name": "Español"
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="FAQ">
+    ```bash
+    # Get all FAQ categories
+    GET http://localhost:8080/api/faq_categories
+
+    # Get all FAQ items
+    GET http://localhost:8080/api/faq_items
+
+    # Get FAQ item by ID
+    GET http://localhost:8080/api/faq_items/{id}
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Info>
+  For a complete catalog of all 195 endpoints, refer to the `ENDPOINTS.md` file in the backend directory.
+</Info>
+
+## Testing the API
+
+### Using cURL
+
+<CodeGroup>
+```bash Create User
+curl -X POST "http://localhost:8080/api/users" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "role": "TOURIST",
+    "fullName": "Ana Perez",
+    "dateOfBirth": "1998-04-17",
+    "email": "ana@example.com",
+    "passwordHash": "hash_demo",
+    "countryCode": "MX",
+    "phoneNumber": "5512345678",
+    "phoneE164": "+525512345678",
+    "preferredLanguageCode": "es",
+    "accountStatus": "ACTIVE"
+  }'
+```
+
+```bash Get All Users
+curl -X GET "http://localhost:8080/api/users"
+```
+
+```bash Create FAQ Item
+curl -X POST "http://localhost:8080/api/faq_items" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "faqCategoryId": 1,
+    "question": "Como pago un tour?",
+    "answer": "Puedes pagar con tarjeta.",
+    "isActive": true,
+    "sortOrder": 1
+  }'
+```
+
+```bash Update FAQ Item
+curl -X PUT "http://localhost:8080/api/faq_items/1" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "faqCategoryId": 1,
+    "question": "Como pago un tour?",
+    "answer": "Tarjeta, transferencia o efectivo.",
+    "isActive": true,
+    "sortOrder": 1
+  }'
+```
+</CodeGroup>
+
+### Using Postman
+
+1. Import the API collection (if available)
+2. Set the base URL to `http://localhost:8080`
+3. Configure headers: `Content-Type: application/json`
+4. Test individual endpoints
+
+## Troubleshooting
+
+### Port Already in Use
+
+If port 8080 is already occupied:
+
+1. **Option 1:** Stop the process using port 8080
+2. **Option 2:** Change the port in `application.properties`:
+   ```properties
+   server.port=8081
+   ```
+
+### Database Connection Errors
+
+<Warning>
+  If you see `Unknown database` or connection refused errors, verify your database is running and configuration is correct.
+</Warning>
+
+**Common causes:**
+
+1. MySQL server is not running
+2. Schema name mismatch in `application.properties`
+3. Incorrect credentials (username/password)
+4. Database not created (run `kinConnect.sql` first)
+
+**Solution steps:**
+
+1. Verify MySQL is running:
+   ```bash
+   mysql -u root -p
+   ```
+2. Check schema exists:
+   ```sql
+   SHOW DATABASES LIKE 'KCv2';
+   ```
+3. Verify credentials in `application.properties`
+4. Check connection URL matches your schema name
+
+### Java Version Mismatch
+
+If you see errors about unsupported class file version:
+
+```
+Unsupported class file major version 65
+```
+
+This means Java 21 is required but an older version is installed. Install Java 21 and update your `JAVA_HOME` environment variable.
+
+### Gradle Build Failures
+
+If the build fails:
+
+1. Clean the project:
+   ```bash
+   ./gradlew clean
+   ```
+2. Delete the build directory manually if needed
+3. Rebuild:
+   ```bash
+   ./gradlew build
+   ```
+
+## Development Tips
+
+### Hot Reload
+
+The project includes Spring Boot DevTools for automatic restart on code changes. Simply save your Java files and the application will restart automatically.
+
+### SQL Logging
+
+SQL queries are logged to the console by default. This is configured in `application.properties`:
+
+```properties
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+```
+
+Disable for production by setting these to `false`.
+
+### Custom Build Directory
+
+The project uses a custom build directory in the system temp folder to avoid permission issues:
+
+```gradle
+def tempBuildDir = new File(System.getProperty('java.io.tmpdir'), 'BackendKC-build')
+layout.buildDirectory.set(tempBuildDir)
+```
+
+## Next Steps
+
+Once the backend is running:
+
+- [Frontend Deployment](/deployment/frontend-deployment) - Set up the frontend application
+- [Configuration](/deployment/configuration) - Fine-tune application settings
+- Explore the API using Postman or cURL
+- Review the complete endpoint catalog in `ENDPOINTS.md`

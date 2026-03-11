@@ -1,0 +1,462 @@
+---
+title: 'Support Tickets'
+description: 'API endpoints for managing support tickets and attachments'
+---
+
+## Support Tickets
+
+Manage customer support tickets with attachments and status tracking.
+
+### Create Support Ticket
+
+<ParamField path="POST" type="endpoint">
+  `/api/support_tickets`
+</ParamField>
+
+Creates a new support ticket.
+
+**Request Body**
+
+<ParamField body="userId" type="integer">
+  ID of the user creating the ticket
+</ParamField>
+
+<ParamField body="roleContext" type="enum">
+  User role context. Values: `GUIDE`, `TOURIST`, `GUEST`
+</ParamField>
+
+<ParamField body="fullName" type="string" required>
+  Full name of the person submitting the ticket
+</ParamField>
+
+<ParamField body="email" type="string" required>
+  Email address for contact
+</ParamField>
+
+<ParamField body="subject" type="string" required>
+  Subject/title of the support ticket
+</ParamField>
+
+<ParamField body="category" type="enum" required>
+  Ticket category. Values: `RESERVAS_VIAJES`, `PAGOS_FACTURACION`, `CUENTA_SEGURIDAD`, `VERIFICACION_GUIAS`, `OTRO`, `GENERAL`
+</ParamField>
+
+<ParamField body="message" type="string" required>
+  Detailed message describing the issue or inquiry
+</ParamField>
+
+<ParamField body="status" type="enum">
+  Current status. Values: `OPEN`, `IN_PROGRESS`, `RESOLVED`, `CLOSED`. Default: `OPEN`
+</ParamField>
+
+<ParamField body="createdAt" type="string">
+  Timestamp when ticket was created (ISO 8601 format)
+</ParamField>
+
+<ParamField body="updatedAt" type="string">
+  Timestamp when ticket was last updated (ISO 8601 format)
+</ParamField>
+
+**Response**
+
+<ResponseField name="ticketId" type="integer">
+  Unique identifier for the support ticket
+</ResponseField>
+
+<ResponseField name="userId" type="integer">
+  ID of the user who created the ticket
+</ResponseField>
+
+<ResponseField name="roleContext" type="enum">
+  User role context: `GUIDE`, `TOURIST`, or `GUEST`
+</ResponseField>
+
+<ResponseField name="fullName" type="string">
+  Full name of the ticket creator
+</ResponseField>
+
+<ResponseField name="email" type="string">
+  Contact email address
+</ResponseField>
+
+<ResponseField name="subject" type="string">
+  Ticket subject
+</ResponseField>
+
+<ResponseField name="category" type="enum">
+  Ticket category
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Ticket message content
+</ResponseField>
+
+<ResponseField name="status" type="enum">
+  Current ticket status
+</ResponseField>
+
+<ResponseField name="createdAt" type="string">
+  Creation timestamp
+</ResponseField>
+
+<ResponseField name="updatedAt" type="string">
+  Last update timestamp
+</ResponseField>
+
+**Example Request**
+
+```bash
+curl -X POST http://localhost:8080/api/support_tickets \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 42,
+    "roleContext": "TOURIST",
+    "fullName": "María González",
+    "email": "maria@example.com",
+    "subject": "Cannot access my booking",
+    "category": "RESERVAS_VIAJES",
+    "message": "I am unable to view my tour booking from last week. The page shows an error.",
+    "status": "OPEN"
+  }'
+```
+
+**Example Response**
+
+```json
+{
+  "ticketId": 1523,
+  "userId": 42,
+  "roleContext": "TOURIST",
+  "fullName": "María González",
+  "email": "maria@example.com",
+  "subject": "Cannot access my booking",
+  "category": "RESERVAS_VIAJES",
+  "message": "I am unable to view my tour booking from last week. The page shows an error.",
+  "status": "OPEN",
+  "createdAt": "2026-03-11T10:30:00",
+  "updatedAt": "2026-03-11T10:30:00"
+}
+```
+
+---
+
+### Get All Support Tickets
+
+<ParamField path="GET" type="endpoint">
+  `/api/support_tickets`
+</ParamField>
+
+Retrieves all support tickets.
+
+**Example Request**
+
+```bash
+curl http://localhost:8080/api/support_tickets
+```
+
+**Example Response**
+
+```json
+[
+  {
+    "ticketId": 1523,
+    "userId": 42,
+    "roleContext": "TOURIST",
+    "fullName": "María González",
+    "email": "maria@example.com",
+    "subject": "Cannot access my booking",
+    "category": "RESERVAS_VIAJES",
+    "message": "I am unable to view my tour booking from last week.",
+    "status": "OPEN",
+    "createdAt": "2026-03-11T10:30:00",
+    "updatedAt": "2026-03-11T10:30:00"
+  }
+]
+```
+
+---
+
+### Get Support Ticket by ID
+
+<ParamField path="GET" type="endpoint">
+  `/api/support_tickets/{id}`
+</ParamField>
+
+Retrieves a specific support ticket by ID.
+
+**Path Parameters**
+
+<ParamField path="id" type="integer" required>
+  The ticket ID
+</ParamField>
+
+**Example Request**
+
+```bash
+curl http://localhost:8080/api/support_tickets/1523
+```
+
+**Example Response**
+
+```json
+{
+  "ticketId": 1523,
+  "userId": 42,
+  "roleContext": "TOURIST",
+  "fullName": "María González",
+  "email": "maria@example.com",
+  "subject": "Cannot access my booking",
+  "category": "RESERVAS_VIAJES",
+  "message": "I am unable to view my tour booking from last week.",
+  "status": "IN_PROGRESS",
+  "createdAt": "2026-03-11T10:30:00",
+  "updatedAt": "2026-03-11T11:15:00"
+}
+```
+
+---
+
+### Update Support Ticket
+
+<ParamField path="PUT" type="endpoint">
+  `/api/support_tickets/{id}`
+</ParamField>
+
+Updates an existing support ticket.
+
+**Path Parameters**
+
+<ParamField path="id" type="integer" required>
+  The ticket ID
+</ParamField>
+
+**Request Body**
+
+Same fields as Create Support Ticket.
+
+**Example Request**
+
+```bash
+curl -X PUT http://localhost:8080/api/support_tickets/1523 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 42,
+    "roleContext": "TOURIST",
+    "fullName": "María González",
+    "email": "maria@example.com",
+    "subject": "Cannot access my booking",
+    "category": "RESERVAS_VIAJES",
+    "message": "I am unable to view my tour booking from last week.",
+    "status": "RESOLVED"
+  }'
+```
+
+---
+
+### Delete Support Ticket
+
+<ParamField path="DELETE" type="endpoint">
+  `/api/support_tickets/{id}`
+</ParamField>
+
+Deletes a support ticket.
+
+**Path Parameters**
+
+<ParamField path="id" type="integer" required>
+  The ticket ID
+</ParamField>
+
+**Example Request**
+
+```bash
+curl -X DELETE http://localhost:8080/api/support_tickets/1523
+```
+
+---
+
+## Support Ticket Attachments
+
+Manage file attachments for support tickets.
+
+### Create Attachment
+
+<ParamField path="POST" type="endpoint">
+  `/api/support_ticket_attachments`
+</ParamField>
+
+Adds a file attachment to a support ticket.
+
+**Request Body**
+
+<ParamField body="ticketId" type="integer" required>
+  ID of the support ticket
+</ParamField>
+
+<ParamField body="fileUrl" type="string" required>
+  URL where the file is stored
+</ParamField>
+
+<ParamField body="fileName" type="string" required>
+  Original name of the file
+</ParamField>
+
+<ParamField body="mimeType" type="string">
+  MIME type of the file (e.g., "image/png", "application/pdf")
+</ParamField>
+
+<ParamField body="fileSizeBytes" type="integer">
+  File size in bytes
+</ParamField>
+
+<ParamField body="uploadedAt" type="string">
+  Timestamp when file was uploaded (ISO 8601 format)
+</ParamField>
+
+**Response**
+
+<ResponseField name="attachmentId" type="integer">
+  Unique identifier for the attachment
+</ResponseField>
+
+<ResponseField name="ticketId" type="integer">
+  Associated support ticket ID
+</ResponseField>
+
+<ResponseField name="fileUrl" type="string">
+  URL of the stored file
+</ResponseField>
+
+<ResponseField name="fileName" type="string">
+  File name
+</ResponseField>
+
+<ResponseField name="mimeType" type="string">
+  MIME type
+</ResponseField>
+
+<ResponseField name="fileSizeBytes" type="integer">
+  File size in bytes
+</ResponseField>
+
+<ResponseField name="uploadedAt" type="string">
+  Upload timestamp
+</ResponseField>
+
+**Example Request**
+
+```bash
+curl -X POST http://localhost:8080/api/support_ticket_attachments \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ticketId": 1523,
+    "fileUrl": "https://cdn.kinconecta.com/attachments/error-screenshot.png",
+    "fileName": "error-screenshot.png",
+    "mimeType": "image/png",
+    "fileSizeBytes": 245678
+  }'
+```
+
+**Example Response**
+
+```json
+{
+  "attachmentId": 8821,
+  "ticketId": 1523,
+  "fileUrl": "https://cdn.kinconecta.com/attachments/error-screenshot.png",
+  "fileName": "error-screenshot.png",
+  "mimeType": "image/png",
+  "fileSizeBytes": 245678,
+  "uploadedAt": "2026-03-11T10:31:25"
+}
+```
+
+---
+
+### Get All Attachments
+
+<ParamField path="GET" type="endpoint">
+  `/api/support_ticket_attachments`
+</ParamField>
+
+Retrieves all support ticket attachments.
+
+**Example Request**
+
+```bash
+curl http://localhost:8080/api/support_ticket_attachments
+```
+
+---
+
+### Get Attachment by ID
+
+<ParamField path="GET" type="endpoint">
+  `/api/support_ticket_attachments/{id}`
+</ParamField>
+
+Retrieves a specific attachment by ID.
+
+**Path Parameters**
+
+<ParamField path="id" type="integer" required>
+  The attachment ID
+</ParamField>
+
+**Example Request**
+
+```bash
+curl http://localhost:8080/api/support_ticket_attachments/8821
+```
+
+---
+
+### Update Attachment
+
+<ParamField path="PUT" type="endpoint">
+  `/api/support_ticket_attachments/{id}`
+</ParamField>
+
+Updates an attachment's metadata.
+
+**Path Parameters**
+
+<ParamField path="id" type="integer" required>
+  The attachment ID
+</ParamField>
+
+**Example Request**
+
+```bash
+curl -X PUT http://localhost:8080/api/support_ticket_attachments/8821 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "ticketId": 1523,
+    "fileUrl": "https://cdn.kinconecta.com/attachments/error-screenshot.png",
+    "fileName": "error-screenshot-updated.png",
+    "mimeType": "image/png",
+    "fileSizeBytes": 245678
+  }'
+```
+
+---
+
+### Delete Attachment
+
+<ParamField path="DELETE" type="endpoint">
+  `/api/support_ticket_attachments/{id}`
+</ParamField>
+
+Deletes an attachment.
+
+**Path Parameters**
+
+<ParamField path="id" type="integer" required>
+  The attachment ID
+</ParamField>
+
+**Example Request**
+
+```bash
+curl -X DELETE http://localhost:8080/api/support_ticket_attachments/8821
+```

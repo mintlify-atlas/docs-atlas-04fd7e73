@@ -1,0 +1,595 @@
+---
+title: 'Error Handling'
+description: 'Comprehensive guide to API error responses, status codes, and troubleshooting'
+---
+
+## Overview
+
+The Kin Conecta API uses standard HTTP status codes and returns detailed error responses in JSON format. All errors follow a consistent structure to make debugging and error handling straightforward.
+
+## Error Response Format
+
+When an error occurs, the API returns a JSON object with the following structure:
+
+```json
+{
+  "status": 404,
+  "error": "Not Found",
+  "message": "User with id 999 not found",
+  "timestamp": "2026-03-11T10:30:00"
+}
+```
+
+### Error Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `status` | Integer | HTTP status code |
+| `error` | String | HTTP status reason phrase |
+| `message` | String | Detailed error message describing what went wrong |
+| `timestamp` | DateTime | When the error occurred (ISO 8601 format) |
+
+## HTTP Status Codes
+
+The API uses standard HTTP status codes to indicate the success or failure of requests.
+
+### Success Codes
+
+| Code | Status | Description |
+|------|--------|-------------|
+| `200` | OK | Request succeeded (GET, PUT) |
+| `201` | Created | Resource created successfully (POST) |
+| `204` | No Content | Resource deleted successfully (DELETE) |
+
+### Client Error Codes
+
+| Code | Status | Description | Common Causes |
+|------|--------|-------------|---------------|
+| `400` | Bad Request | Invalid request format or data | Missing required fields, invalid JSON, malformed data |
+| `401` | Unauthorized | Authentication required or failed | Missing/invalid token, expired session |
+| `403` | Forbidden | Insufficient permissions | User doesn't have access to resource |
+| `404` | Not Found | Resource doesn't exist | Invalid ID, resource was deleted |
+| `409` | Conflict | Resource conflict | Duplicate unique values, constraint violation |
+| `422` | Unprocessable Entity | Validation failed | Invalid data format, business logic violation |
+
+### Server Error Codes
+
+| Code | Status | Description | Common Causes |
+|------|--------|-------------|---------------|
+| `500` | Internal Server Error | Unexpected server error | Database connection issues, unhandled exceptions |
+| `503` | Service Unavailable | Service temporarily unavailable | Database down, maintenance mode |
+
+## Common Error Scenarios
+
+### Resource Not Found (404)
+
+Occurs when trying to access a resource that doesn't exist.
+
+#### Example Request
+
+```bash
+curl -X GET "http://localhost:8080/api/users/999"
+```
+
+#### Error Response
+
+```json
+{
+  "status": 404,
+  "error": "Not Found",
+  "message": "User with id 999 not found",
+  "timestamp": "2026-03-11T10:30:00"
+}
+```
+
+<Note>
+The `ResourceNotFoundException` is thrown by the service layer when a requested entity cannot be found in the database.
+</Note>
+
+### Bad Request (400)
+
+Occurs when the request contains invalid data or is malformed.
+
+#### Example Request
+
+```bash
+curl -X POST "http://localhost:8080/api/users" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "role": "INVALID_ROLE",
+    "email": "not-an-email"
+  }'
+```
+
+#### Error Response
+
+```json
+{
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Invalid role value: INVALID_ROLE",
+  "timestamp": "2026-03-11T10:30:00"
+}
+```
+
+<Warning>
+The `BadRequestException` is used for validation errors and invalid input data. Always validate data on the client side before sending requests.
+</Warning>
+
+### Internal Server Error (500)
+
+Occurs when an unexpected error happens on the server.
+
+#### Example Response
+
+```json
+{
+  "status": 500,
+  "error": "Internal Server Error",
+  "message": "Unexpected internal server error",
+  "timestamp": "2026-03-11T10:30:00"
+}
+```
+
+<Note>
+For security reasons, internal server errors return a generic message. Check server logs for detailed error information.
+</Note>
+
+## Error Handling by Endpoint
+
+### Create Operations (POST)
+
+<CodeGroup>
+
+```bash Success (201)
+curl -X POST "http://localhost:8080/api/languages" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "languageCode": "es",
+    "name": "Espanol"
+  }'
+
+# Response: 201 Created
+{
+  "languageCode": "es",
+  "name": "Espanol",
+  "createdAt": "2026-03-11T10:30:00"
+}
+```
+
+```bash Bad Request (400)
+curl -X POST "http://localhost:8080/api/languages" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "languageCode": "",
+    "name": ""
+  }'
+
+# Response: 400 Bad Request
+{
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Language code cannot be empty",
+  "timestamp": "2026-03-11T10:30:00"
+}
+```
+
+```bash Conflict (409)
+curl -X POST "http://localhost:8080/api/languages" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "languageCode": "es",
+    "name": "Espanol"
+  }'
+
+# Response: 409 Conflict (if language already exists)
+{
+  "status": 409,
+  "error": "Conflict",
+  "message": "Language with code 'es' already exists",
+  "timestamp": "2026-03-11T10:30:00"
+}
+```
+
+</CodeGroup>
+
+### Read Operations (GET)
+
+<CodeGroup>
+
+```bash Success (200)
+curl -X GET "http://localhost:8080/api/faq_items/1"
+
+# Response: 200 OK
+{
+  "faqItemId": 1,
+  "faqCategoryId": 1,
+  "question": "Como pago un tour?",
+  "answer": "Puedes pagar con tarjeta.",
+  "isActive": true
+}
+```
+
+```bash Not Found (404)
+curl -X GET "http://localhost:8080/api/faq_items/999"
+
+# Response: 404 Not Found
+{
+  "status": 404,
+  "error": "Not Found",
+  "message": "FAQ item with id 999 not found",
+  "timestamp": "2026-03-11T10:30:00"
+}
+```
+
+</CodeGroup>
+
+### Update Operations (PUT)
+
+<CodeGroup>
+
+```bash Success (200)
+curl -X PUT "http://localhost:8080/api/faq_items/1" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "faqCategoryId": 1,
+    "question": "Como pago un tour?",
+    "answer": "Tarjeta, transferencia o efectivo.",
+    "isActive": true,
+    "sortOrder": 1
+  }'
+
+# Response: 200 OK
+{
+  "faqItemId": 1,
+  "faqCategoryId": 1,
+  "question": "Como pago un tour?",
+  "answer": "Tarjeta, transferencia o efectivo.",
+  "isActive": true
+}
+```
+
+```bash Not Found (404)
+curl -X PUT "http://localhost:8080/api/faq_items/999" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "question": "Updated question"
+  }'
+
+# Response: 404 Not Found
+{
+  "status": 404,
+  "error": "Not Found",
+  "message": "FAQ item with id 999 not found",
+  "timestamp": "2026-03-11T10:30:00"
+}
+```
+
+</CodeGroup>
+
+### Delete Operations (DELETE)
+
+<CodeGroup>
+
+```bash Success (204)
+curl -X DELETE "http://localhost:8080/api/faq_items/1"
+
+# Response: 204 No Content
+# (No response body)
+```
+
+```bash Not Found (404)
+curl -X DELETE "http://localhost:8080/api/faq_items/999"
+
+# Response: 404 Not Found
+{
+  "status": 404,
+  "error": "Not Found",
+  "message": "FAQ item with id 999 not found",
+  "timestamp": "2026-03-11T10:30:00"
+}
+```
+
+</CodeGroup>
+
+## Handling Composite Keys
+
+Some endpoints use composite keys (multiple path parameters). Errors can occur if any part of the key is invalid.
+
+### Example with Composite Key
+
+```bash
+curl -X GET "http://localhost:8080/api/tourist_profile_languages/1/es"
+
+# Success: 200 OK
+{
+  "userId": 1,
+  "languageCode": "es",
+  "proficiencyLevel": "NATIVE"
+}
+
+# Error: 404 Not Found
+curl -X GET "http://localhost:8080/api/tourist_profile_languages/999/xx"
+
+{
+  "status": 404,
+  "error": "Not Found",
+  "message": "Tourist profile language not found for userId 999 and languageCode xx",
+  "timestamp": "2026-03-11T10:30:00"
+}
+```
+
+## Client-Side Error Handling
+
+Implement robust error handling in your client application:
+
+<CodeGroup>
+
+```javascript JavaScript/TypeScript
+async function createUser(userData) {
+  try {
+    const response = await fetch('http://localhost:8080/api/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData)
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      
+      switch (error.status) {
+        case 400:
+          console.error('Invalid data:', error.message);
+          break;
+        case 404:
+          console.error('Resource not found:', error.message);
+          break;
+        case 500:
+          console.error('Server error:', error.message);
+          break;
+        default:
+          console.error('Unexpected error:', error.message);
+      }
+      
+      throw new Error(error.message);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Request failed:', error);
+    throw error;
+  }
+}
+```
+
+```python Python
+import requests
+from requests.exceptions import RequestException
+
+def create_user(user_data):
+    try:
+        response = requests.post(
+            'http://localhost:8080/api/users',
+            json=user_data
+        )
+        
+        response.raise_for_status()
+        return response.json()
+        
+    except requests.exceptions.HTTPError as e:
+        error_data = e.response.json()
+        
+        if e.response.status_code == 400:
+            print(f"Invalid data: {error_data['message']}")
+        elif e.response.status_code == 404:
+            print(f"Resource not found: {error_data['message']}")
+        elif e.response.status_code == 500:
+            print(f"Server error: {error_data['message']}")
+        else:
+            print(f"Unexpected error: {error_data['message']}")
+        
+        raise
+        
+    except RequestException as e:
+        print(f"Request failed: {e}")
+        raise
+```
+
+```java Java
+import java.net.http.*;
+import com.google.gson.Gson;
+
+public class ApiClient {
+    private final HttpClient client = HttpClient.newHttpClient();
+    private final Gson gson = new Gson();
+    
+    public User createUser(User userData) throws Exception {
+        String json = gson.toJson(userData);
+        
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create("http://localhost:8080/api/users"))
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(json))
+            .build();
+        
+        HttpResponse<String> response = client.send(
+            request,
+            HttpResponse.BodyHandlers.ofString()
+        );
+        
+        if (response.statusCode() >= 400) {
+            ErrorResponse error = gson.fromJson(
+                response.body(),
+                ErrorResponse.class
+            );
+            
+            switch (error.status) {
+                case 400:
+                    System.err.println("Invalid data: " + error.message);
+                    break;
+                case 404:
+                    System.err.println("Resource not found: " + error.message);
+                    break;
+                case 500:
+                    System.err.println("Server error: " + error.message);
+                    break;
+                default:
+                    System.err.println("Unexpected error: " + error.message);
+            }
+            
+            throw new Exception(error.message);
+        }
+        
+        return gson.fromJson(response.body(), User.class);
+    }
+}
+```
+
+</CodeGroup>
+
+## Troubleshooting Common Issues
+
+<AccordionGroup>
+  <Accordion title="Database Connection Errors">
+    **Error**: `500 Internal Server Error` with message about database connectivity
+    
+    **Common Causes**:
+    - MySQL server is not running
+    - Incorrect database credentials in `application.properties`
+    - Database schema doesn't exist
+    - Network/firewall blocking database port (3306)
+    
+    **Solutions**:
+    1. Verify MySQL server is running: `mysql -u root -p`
+    2. Check database configuration in `src/main/resources/application.properties`
+    3. Ensure schema exists: Run `kinConnect.sql` script
+    4. Verify username/password match MySQL configuration
+  </Accordion>
+
+  <Accordion title="Schema/Table Not Found">
+    **Error**: `Unknown database` or `Table doesn't exist`
+    
+    **Solution**:
+    1. Check that schema name in `spring.datasource.url` matches actual schema
+    2. Default schema is `kin_conecta` - verify in MySQL Workbench
+    3. If using different name, either:
+       - Update URL: `jdbc:mysql://localhost:3306/kin_conecta`
+       - Or recreate schema with matching name
+  </Accordion>
+
+  <Accordion title="Port Already in Use">
+    **Error**: Port 8080 already in use
+    
+    **Solutions**:
+    1. Stop the process using port 8080
+    2. Or configure different port in `application.properties`:
+       ```properties
+       server.port=8081
+       ```
+  </Accordion>
+
+  <Accordion title="Invalid JSON Format">
+    **Error**: `400 Bad Request` with JSON parsing error
+    
+    **Common Causes**:
+    - Missing quotes around strings
+    - Trailing commas in JSON objects
+    - Invalid escape sequences
+    - Missing Content-Type header
+    
+    **Solution**:
+    1. Validate JSON with a linter
+    2. Always include: `Content-Type: application/json`
+    3. Use proper JSON encoding in your client library
+  </Accordion>
+
+  <Accordion title="Date/Time Format Errors">
+    **Error**: `400 Bad Request` with message about invalid date format
+    
+    **Solution**:
+    Use ISO 8601 format:
+    - Date: `"2026-03-11"` (YYYY-MM-DD)
+    - DateTime: `"2026-03-11T10:30:00"` (YYYY-MM-DDTHH:mm:ss)
+    - Include leading zeros for single-digit values
+  </Accordion>
+
+  <Accordion title="Enum Validation Errors">
+    **Error**: `400 Bad Request` with message about invalid enum value
+    
+    **Solution**:
+    - Enum values are CASE-SENSITIVE and must be UPPERCASE
+    - Example: Use `"TOURIST"` not `"tourist"` or `"Tourist"`
+    - Check API documentation for valid enum values
+  </Accordion>
+</AccordionGroup>
+
+## Error Response Implementation
+
+The API uses a centralized exception handler to ensure consistent error responses across all endpoints.
+
+### Exception Handler
+
+The `GlobalExceptionHandler` (located at `src/main/java/org/generation/socialNetwork/configuration/exception/GlobalExceptionHandler.java`) catches exceptions and converts them to standardized error responses:
+
+```java
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+    
+    // Handles ResourceNotFoundException -> 404 Not Found
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(ResourceNotFoundException ex) {
+        return build(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+    
+    // Handles BadRequestException -> 400 Bad Request
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequest(BadRequestException ex) {
+        return build(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+    
+    // Handles all other exceptions -> 500 Internal Server Error
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGeneral(Exception ex) {
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, 
+                    "Unexpected internal server error");
+    }
+}
+```
+
+### Custom Exceptions
+
+The API defines custom exception classes:
+
+- **ResourceNotFoundException**: Thrown when a requested resource doesn't exist
+- **BadRequestException**: Thrown for invalid input or validation errors
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Validate Before Sending" icon="check">
+    Validate data on the client side before making API requests to catch errors early.
+  </Card>
+  
+  <Card title="Handle All Status Codes" icon="code">
+    Implement handlers for all possible status codes (200, 201, 204, 400, 404, 500).
+  </Card>
+  
+  <Card title="Log Error Details" icon="file-lines">
+    Log full error responses for debugging, but show user-friendly messages to users.
+  </Card>
+  
+  <Card title="Implement Retry Logic" icon="rotate">
+    For 500 errors, implement exponential backoff retry logic with reasonable limits.
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="API Overview" icon="book" href="/api/overview">
+    Learn about API architecture and conventions
+  </Card>
+  <Card title="Authentication" icon="lock" href="/api/authentication">
+    Secure your API requests with authentication
+  </Card>
+</CardGroup>

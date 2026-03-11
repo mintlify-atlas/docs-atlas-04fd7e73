@@ -1,0 +1,343 @@
+---
+title: Chat & Messaging
+description: Real-time messaging system connecting tourists and guides in Kin Conecta
+---
+
+Kin Conecta's messaging system enables direct communication between tourists and guides throughout the booking and tour experience.
+
+## Overview
+
+The messaging system is built around two core concepts:
+
+<CardGroup cols={2}>
+  <Card title="Chat Threads" icon="comments">
+    Conversation containers linking tourists and guides
+  </Card>
+  <Card title="Chat Messages" icon="message">
+    Individual messages within a conversation
+  </Card>
+</CardGroup>
+
+## Chat Threads
+
+Chat threads organize conversations between tourists and guides, typically linked to a specific trip booking.
+
+### Data Model
+
+```java
+// Model: ChatThread.java
+package org.generation.socialNetwork.messenger.model;
+
+@Entity
+@Table(name = "chat_threads")
+public class ChatThread {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long threadId;
+    
+    private Long tripId;      // Associated trip booking
+    private Long touristId;   // Tourist user ID
+    private Long guideId;     // Guide user ID
+    
+    private LocalDateTime lastMessageAt;
+    
+    @Enumerated(EnumType.STRING)
+    private ChatThreadStatus status;
+    
+    private LocalDateTime createdAt;
+}
+```
+
+### Thread Status
+
+```java
+public enum ChatThreadStatus {
+    ACTIVE,
+    ARCHIVED,
+    BLOCKED
+}
+```
+
+<CardGroup cols={3}>
+  <Card title="ACTIVE" icon="check">
+    Thread is open for messaging
+  </Card>
+  <Card title="ARCHIVED" icon="box-archive">
+    Thread is archived but messages preserved
+  </Card>
+  <Card title="BLOCKED" icon="ban">
+    Thread is blocked, no further messages allowed
+  </Card>
+</CardGroup>
+
+### Key Features
+
+- **Trip Association**: Each thread is typically linked to a `TripBooking` via `trip_id`
+- **Participant Tracking**: Explicit `tourist_id` and `guide_id` fields
+- **Last Activity**: `last_message_at` timestamp for sorting and notifications
+- **Status Management**: Control thread lifecycle with status enum
+
+<Note>
+Threads are automatically created when a tourist books a tour or initiates conversation with a guide.
+</Note>
+
+## Chat Messages
+
+Messages are the actual content sent within a chat thread.
+
+### Data Model
+
+```java
+// Model: ChatMessage.java
+@Entity
+@Table(name = "chat_messages")
+public class ChatMessage {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long messageId;
+    
+    private Long threadId;       // Parent thread
+    private Long senderUserId;   // Who sent this message
+    
+    private String body;         // Message content
+    
+    @Enumerated(EnumType.STRING)
+    private ChatMessageMessageType messageType;
+    
+    private LocalDateTime sentAt;
+    private LocalDateTime readAt; // When message was read (null = unread)
+}
+```
+
+### Message Types
+
+```java
+public enum ChatMessageMessageType {
+    TEXT,    // Regular text message
+    SYSTEM,  // System-generated message
+    FILE     // File attachment
+}
+```
+
+<Accordion title="TEXT Messages">
+  Standard messages sent by tourists or guides. The `body` field contains the message text.
+  
+  Example:
+  ```json
+  {
+    "messageType": "TEXT",
+    "body": "Looking forward to the tour! Can we meet at 9 AM?"
+  }
+  ```
+</Accordion>
+
+<Accordion title="SYSTEM Messages">
+  Automatically generated messages for events like booking confirmations, status changes, or reminders.
+  
+  Example:
+  ```json
+  {
+    "messageType": "SYSTEM",
+    "body": "Booking confirmed for Tokyo Food Tour on 2024-06-15"
+  }
+  ```
+</Accordion>
+
+<Accordion title="FILE Messages">
+  Messages containing file attachments. The `body` field typically contains a file URL or reference.
+  
+  Example:
+  ```json
+  {
+    "messageType": "FILE",
+    "body": "https://storage.kinconecta.com/files/itinerary.pdf"
+  }
+  ```
+</Accordion>
+
+## Message Features
+
+### Read Receipts
+
+The `read_at` timestamp tracks when messages are read:
+
+- `null` = Message is unread
+- `LocalDateTime` value = When the message was read
+
+<Tip>
+Use read receipts to implement unread message counts and notifications.
+</Tip>
+
+### Sender Identification
+
+The `sender_user_id` field identifies who sent each message:
+
+- Compare with `thread.touristId` to check if tourist sent it
+- Compare with `thread.guideId` to check if guide sent it
+- System messages typically have a null or special sender ID
+
+## API Endpoints
+
+### Chat Threads
+
+```
+GET    /api/v1/chat-threads
+GET    /api/v1/chat-threads/{id}
+POST   /api/v1/chat-threads
+PUT    /api/v1/chat-threads/{id}
+DELETE /api/v1/chat-threads/{id}
+```
+
+**Common Query Parameters:**
+- `?touristId={id}` - Get threads for a tourist
+- `?guideId={id}` - Get threads for a guide
+- `?tripId={id}` - Get thread for a specific trip
+- `?status={status}` - Filter by thread status
+
+### Chat Messages
+
+```
+GET    /api/v1/chat-messages
+GET    /api/v1/chat-messages/{id}
+POST   /api/v1/chat-messages
+PUT    /api/v1/chat-messages/{id}
+DELETE /api/v1/chat-messages/{id}
+```
+
+**Common Query Parameters:**
+- `?threadId={id}` - Get all messages in a thread
+- `?senderUserId={id}` - Get messages sent by a user
+- `?messageType={type}` - Filter by message type
+
+## Usage Examples
+
+### Creating a Thread
+
+```json
+POST /api/v1/chat-threads
+{
+  "tripId": 789,
+  "touristId": 123,
+  "guideId": 456,
+  "status": "ACTIVE"
+}
+```
+
+### Sending a Message
+
+```json
+POST /api/v1/chat-messages
+{
+  "threadId": 101,
+  "senderUserId": 123,
+  "body": "Hi! I have some questions about the tour.",
+  "messageType": "TEXT",
+  "sentAt": "2024-03-11T10:30:00Z"
+}
+```
+
+### Marking Message as Read
+
+```json
+PUT /api/v1/chat-messages/555
+{
+  "readAt": "2024-03-11T10:35:00Z"
+}
+```
+
+### Getting Unread Messages
+
+Client-side filter for messages where `readAt` is `null` and `senderUserId` is not the current user.
+
+## Integration with Notifications
+
+The messaging system integrates with the notifications module:
+
+```java
+// Reference: notifications package
+// When a new message is created, a notification is sent to the recipient
+```
+
+<CardGroup cols={2}>
+  <Card title="New Message Alert" icon="bell">
+    Recipient receives notification when new message arrives
+  </Card>
+  <Card title="Read Receipt" icon="check-double">
+    Sender can see when message is read
+  </Card>
+</CardGroup>
+
+## Best Practices
+
+### Thread Management
+
+<Steps>
+  <Step title="Create on Booking">
+    Automatically create a thread when a tourist books a tour
+  </Step>
+  <Step title="Update Last Activity">
+    Update `lastMessageAt` whenever a new message is sent
+  </Step>
+  <Step title="Archive Completed Trips">
+    Set status to `ARCHIVED` after trip is completed and conversation ends
+  </Step>
+</Steps>
+
+### Message Handling
+
+<Warning>
+**Important**: Always validate that the sender has permission to send messages in the thread (must be either the tourist or guide associated with the thread).
+</Warning>
+
+<Tip>
+**Performance**: When loading a thread, paginate messages to avoid loading entire conversation history at once. Load recent messages first.
+</Tip>
+
+## Real-Time Messaging
+
+While the REST API provides basic CRUD operations, real-time messaging typically requires:
+
+- **WebSocket Connection**: For instant message delivery
+- **Presence Indicators**: Show when users are online
+- **Typing Indicators**: Show when someone is typing
+
+<Info>
+These real-time features would be implemented in addition to the base REST API, typically using WebSocket protocols or server-sent events.
+</Info>
+
+## Common Use Cases
+
+<Accordion title="Pre-Booking Questions">
+  Tourists can message guides before booking to ask questions about tours, meeting points, what to bring, etc.
+  
+  **Implementation**: Create thread without `tripId`, allow messaging before booking is confirmed.
+</Accordion>
+
+<Accordion title="Trip Coordination">
+  After booking, tourists and guides coordinate details like exact meeting location, time adjustments, special requests.
+  
+  **Implementation**: Thread with `tripId` set, status `ACTIVE`, messages from both parties.
+</Accordion>
+
+<Accordion title="Post-Trip Follow-up">
+  Guides can thank tourists, tourists can ask follow-up questions, share photos.
+  
+  **Implementation**: Keep thread `ACTIVE` for a period after trip completion, then archive.
+</Accordion>
+
+<Accordion title="System Notifications">
+  Automated messages for booking confirmations, reminders, cancellations.
+  
+  **Implementation**: Create messages with `messageType: SYSTEM` and appropriate `body` text.
+</Accordion>
+
+## Related Features
+
+<CardGroup cols={2}>
+  <Card title="Bookings" icon="calendar-check" href="/features/bookings">
+    See how threads are linked to trip bookings
+  </Card>
+  <Card title="Notifications" icon="bell" href="/features/notifications">
+    Learn about the notification system
+  </Card>
+</CardGroup>

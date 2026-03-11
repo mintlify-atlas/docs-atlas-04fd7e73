@@ -1,0 +1,262 @@
+---
+title: 'Contact Messages'
+description: 'API endpoints for managing contact form messages'
+---
+
+## Contact Messages
+
+Manage contact form submissions from users.
+
+### Create Contact Message
+
+<ParamField path="POST" type="endpoint">
+  `/api/contact_messages`
+</ParamField>
+
+Creates a new contact message from the contact form.
+
+**Request Body**
+
+<ParamField body="name" type="string" required>
+  Name of the person submitting the message
+</ParamField>
+
+<ParamField body="email" type="string" required>
+  Email address for replies
+</ParamField>
+
+<ParamField body="subject" type="string" required>
+  Subject of the message
+</ParamField>
+
+<ParamField body="message" type="string" required>
+  Message content
+</ParamField>
+
+<ParamField body="sourcePage" type="string">
+  Page URL where the contact form was submitted
+</ParamField>
+
+<ParamField body="status" type="enum">
+  Message status. Values: `NEW`, `READ`, `ARCHIVED`. Default: `NEW`
+</ParamField>
+
+<ParamField body="createdAt" type="string">
+  Timestamp when message was created (ISO 8601 format)
+</ParamField>
+
+**Response**
+
+<ResponseField name="contactMessageId" type="integer">
+  Unique identifier for the contact message
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Sender's name
+</ResponseField>
+
+<ResponseField name="email" type="string">
+  Sender's email
+</ResponseField>
+
+<ResponseField name="subject" type="string">
+  Message subject
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Message content
+</ResponseField>
+
+<ResponseField name="sourcePage" type="string">
+  Source page URL
+</ResponseField>
+
+<ResponseField name="status" type="enum">
+  Message status: `NEW`, `READ`, or `ARCHIVED`
+</ResponseField>
+
+<ResponseField name="createdAt" type="string">
+  Creation timestamp
+</ResponseField>
+
+**Example Request**
+
+```bash
+curl -X POST http://localhost:8080/api/contact_messages \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Carlos Hernández",
+    "email": "carlos@example.com",
+    "subject": "Partnership inquiry",
+    "message": "I am interested in partnering with Kin Conecta to offer tours in Guadalajara. Could you provide more information about your guide program?",
+    "sourcePage": "https://kinconecta.com/contact",
+    "status": "NEW"
+  }'
+```
+
+**Example Response**
+
+```json
+{
+  "contactMessageId": 2341,
+  "name": "Carlos Hernández",
+  "email": "carlos@example.com",
+  "subject": "Partnership inquiry",
+  "message": "I am interested in partnering with Kin Conecta to offer tours in Guadalajara. Could you provide more information about your guide program?",
+  "sourcePage": "https://kinconecta.com/contact",
+  "status": "NEW",
+  "createdAt": "2026-03-11T14:22:35"
+}
+```
+
+---
+
+### Get All Contact Messages
+
+<ParamField path="GET" type="endpoint">
+  `/api/contact_messages`
+</ParamField>
+
+Retrieves all contact messages.
+
+**Example Request**
+
+```bash
+curl http://localhost:8080/api/contact_messages
+```
+
+**Example Response**
+
+```json
+[
+  {
+    "contactMessageId": 2341,
+    "name": "Carlos Hernández",
+    "email": "carlos@example.com",
+    "subject": "Partnership inquiry",
+    "message": "I am interested in partnering with Kin Conecta.",
+    "sourcePage": "https://kinconecta.com/contact",
+    "status": "NEW",
+    "createdAt": "2026-03-11T14:22:35"
+  },
+  {
+    "contactMessageId": 2340,
+    "name": "Ana Martínez",
+    "email": "ana@example.com",
+    "subject": "General question",
+    "message": "What areas do your guides cover?",
+    "sourcePage": "https://kinconecta.com/faq",
+    "status": "READ",
+    "createdAt": "2026-03-11T09:15:22"
+  }
+]
+```
+
+---
+
+### Get Contact Message by ID
+
+<ParamField path="GET" type="endpoint">
+  `/api/contact_messages/{id}`
+</ParamField>
+
+Retrieves a specific contact message by ID.
+
+**Path Parameters**
+
+<ParamField path="id" type="integer" required>
+  The contact message ID
+</ParamField>
+
+**Example Request**
+
+```bash
+curl http://localhost:8080/api/contact_messages/2341
+```
+
+**Example Response**
+
+```json
+{
+  "contactMessageId": 2341,
+  "name": "Carlos Hernández",
+  "email": "carlos@example.com",
+  "subject": "Partnership inquiry",
+  "message": "I am interested in partnering with Kin Conecta to offer tours in Guadalajara. Could you provide more information about your guide program?",
+  "sourcePage": "https://kinconecta.com/contact",
+  "status": "NEW",
+  "createdAt": "2026-03-11T14:22:35"
+}
+```
+
+---
+
+### Update Contact Message
+
+<ParamField path="PUT" type="endpoint">
+  `/api/contact_messages/{id}`
+</ParamField>
+
+Updates a contact message (typically to change its status).
+
+**Path Parameters**
+
+<ParamField path="id" type="integer" required>
+  The contact message ID
+</ParamField>
+
+**Request Body**
+
+Same fields as Create Contact Message.
+
+**Example Request**
+
+```bash
+curl -X PUT http://localhost:8080/api/contact_messages/2341 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Carlos Hernández",
+    "email": "carlos@example.com",
+    "subject": "Partnership inquiry",
+    "message": "I am interested in partnering with Kin Conecta to offer tours in Guadalajara.",
+    "sourcePage": "https://kinconecta.com/contact",
+    "status": "READ"
+  }'
+```
+
+**Example Response**
+
+```json
+{
+  "contactMessageId": 2341,
+  "name": "Carlos Hernández",
+  "email": "carlos@example.com",
+  "subject": "Partnership inquiry",
+  "message": "I am interested in partnering with Kin Conecta to offer tours in Guadalajara.",
+  "sourcePage": "https://kinconecta.com/contact",
+  "status": "READ",
+  "createdAt": "2026-03-11T14:22:35"
+}
+```
+
+---
+
+### Delete Contact Message
+
+<ParamField path="DELETE" type="endpoint">
+  `/api/contact_messages/{id}`
+</ParamField>
+
+Deletes a contact message.
+
+**Path Parameters**
+
+<ParamField path="id" type="integer" required>
+  The contact message ID
+</ParamField>
+
+**Example Request**
+
+```bash
+curl -X DELETE http://localhost:8080/api/contact_messages/2341
+```

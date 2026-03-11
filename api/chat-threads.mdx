@@ -1,0 +1,281 @@
+---
+title: Chat Threads
+description: Manage chat threads between tourists and guides for trip bookings
+---
+
+## Overview
+
+Chat threads represent conversations between tourists and guides related to specific trip bookings. Each thread tracks participants, associated trips, and conversation status.
+
+## Create Chat Thread
+
+<CodeGroup>
+```bash cURL
+curl -X POST http://localhost:8080/api/chat_threads \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tripId": 1,
+    "touristId": 10,
+    "guideId": 5,
+    "status": "ACTIVE",
+    "lastMessageAt": "2026-03-11T14:30:00",
+    "createdAt": "2026-03-11T14:30:00"
+  }'
+```
+</CodeGroup>
+
+Create a new chat thread for communication between a tourist and guide.
+
+### Request Body
+
+<ParamField body="tripId" type="integer">
+  The ID of the trip booking associated with this thread
+</ParamField>
+
+<ParamField body="touristId" type="integer" required>
+  The user ID of the tourist participant
+</ParamField>
+
+<ParamField body="guideId" type="integer" required>
+  The user ID of the guide participant
+</ParamField>
+
+<ParamField body="status" type="string">
+  Thread status. Valid values: `ACTIVE`, `ARCHIVED`, `BLOCKED`
+</ParamField>
+
+<ParamField body="lastMessageAt" type="string">
+  Timestamp of the last message in ISO 8601 format (e.g., `2026-03-11T14:30:00`)
+</ParamField>
+
+<ParamField body="createdAt" type="string">
+  Thread creation timestamp in ISO 8601 format (e.g., `2026-03-11T14:30:00`)
+</ParamField>
+
+### Response
+
+<ResponseField name="threadId" type="integer">
+  Unique identifier for the chat thread
+</ResponseField>
+
+<ResponseField name="tripId" type="integer">
+  The associated trip booking ID
+</ResponseField>
+
+<ResponseField name="touristId" type="integer">
+  The tourist participant's user ID
+</ResponseField>
+
+<ResponseField name="guideId" type="integer">
+  The guide participant's user ID
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Current thread status (`ACTIVE`, `ARCHIVED`, or `BLOCKED`)
+</ResponseField>
+
+<ResponseField name="lastMessageAt" type="string">
+  Timestamp of the last message
+</ResponseField>
+
+<ResponseField name="createdAt" type="string">
+  Thread creation timestamp
+</ResponseField>
+
+<ResponseExample>
+```json Response
+{
+  "threadId": 42,
+  "tripId": 1,
+  "touristId": 10,
+  "guideId": 5,
+  "status": "ACTIVE",
+  "lastMessageAt": "2026-03-11T14:30:00",
+  "createdAt": "2026-03-11T14:30:00"
+}
+```
+</ResponseExample>
+
+---
+
+## Get All Chat Threads
+
+<CodeGroup>
+```bash cURL
+curl -X GET http://localhost:8080/api/chat_threads \
+  -H "Content-Type: application/json"
+```
+</CodeGroup>
+
+Retrieve a list of all chat threads in the system.
+
+### Response
+
+Returns an array of chat thread objects.
+
+<ResponseExample>
+```json Response
+[
+  {
+    "threadId": 42,
+    "tripId": 1,
+    "touristId": 10,
+    "guideId": 5,
+    "status": "ACTIVE",
+    "lastMessageAt": "2026-03-11T14:30:00",
+    "createdAt": "2026-03-11T14:00:00"
+  },
+  {
+    "threadId": 43,
+    "tripId": 2,
+    "touristId": 11,
+    "guideId": 5,
+    "status": "ARCHIVED",
+    "lastMessageAt": "2026-03-10T16:20:00",
+    "createdAt": "2026-03-10T10:00:00"
+  }
+]
+```
+</ResponseExample>
+
+---
+
+## Get Chat Thread by ID
+
+<CodeGroup>
+```bash cURL
+curl -X GET http://localhost:8080/api/chat_threads/42 \
+  -H "Content-Type: application/json"
+```
+</CodeGroup>
+
+Retrieve a specific chat thread by its ID.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The unique identifier of the chat thread
+</ParamField>
+
+### Response
+
+<ResponseExample>
+```json Response
+{
+  "threadId": 42,
+  "tripId": 1,
+  "touristId": 10,
+  "guideId": 5,
+  "status": "ACTIVE",
+  "lastMessageAt": "2026-03-11T14:30:00",
+  "createdAt": "2026-03-11T14:00:00"
+}
+```
+</ResponseExample>
+
+---
+
+## Update Chat Thread
+
+<CodeGroup>
+```bash cURL
+curl -X PUT http://localhost:8080/api/chat_threads/42 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tripId": 1,
+    "touristId": 10,
+    "guideId": 5,
+    "status": "ARCHIVED",
+    "lastMessageAt": "2026-03-11T16:00:00",
+    "createdAt": "2026-03-11T14:00:00"
+  }'
+```
+</CodeGroup>
+
+Update an existing chat thread. Common use cases include changing the thread status or updating the last message timestamp.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The unique identifier of the chat thread to update
+</ParamField>
+
+### Request Body
+
+<ParamField body="tripId" type="integer">
+  The ID of the trip booking associated with this thread
+</ParamField>
+
+<ParamField body="touristId" type="integer">
+  The user ID of the tourist participant
+</ParamField>
+
+<ParamField body="guideId" type="integer">
+  The user ID of the guide participant
+</ParamField>
+
+<ParamField body="status" type="string">
+  Thread status. Valid values: `ACTIVE`, `ARCHIVED`, `BLOCKED`
+</ParamField>
+
+<ParamField body="lastMessageAt" type="string">
+  Timestamp of the last message in ISO 8601 format
+</ParamField>
+
+<ParamField body="createdAt" type="string">
+  Thread creation timestamp in ISO 8601 format
+</ParamField>
+
+### Response
+
+<ResponseExample>
+```json Response
+{
+  "threadId": 42,
+  "tripId": 1,
+  "touristId": 10,
+  "guideId": 5,
+  "status": "ARCHIVED",
+  "lastMessageAt": "2026-03-11T16:00:00",
+  "createdAt": "2026-03-11T14:00:00"
+}
+```
+</ResponseExample>
+
+---
+
+## Delete Chat Thread
+
+<CodeGroup>
+```bash cURL
+curl -X DELETE http://localhost:8080/api/chat_threads/42 \
+  -H "Content-Type: application/json"
+```
+</CodeGroup>
+
+Permanently delete a chat thread. This will remove the thread and may affect associated messages.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The unique identifier of the chat thread to delete
+</ParamField>
+
+### Response
+
+Returns a success status code (typically 204 No Content) if the deletion was successful.
+
+---
+
+## Thread Status Values
+
+Chat threads can have one of the following status values:
+
+- **ACTIVE**: Thread is currently active and can receive messages
+- **ARCHIVED**: Thread has been archived, typically after trip completion
+- **BLOCKED**: Thread has been blocked, preventing further messages
+
+## Related Endpoints
+
+- [Chat Messages](/api/chat-messages) - Send and receive messages within threads
+- [Trip Bookings](/api/trip-bookings) - Manage trip bookings associated with threads

@@ -1,0 +1,131 @@
+---
+title: "Guide Certifications"
+description: "Manage guide professional certifications and qualifications"
+---
+
+## Create Certification
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.kinconecta.com/api/guide_certifications \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 789,
+    "name": "Certified Tourist Guide - National Tourism Board"
+  }'
+```
+</CodeGroup>
+
+Add a new certification to a guide's profile.
+
+### Request Body
+
+<ParamField body="userId" type="integer" required>
+  ID of the guide user
+</ParamField>
+
+<ParamField body="name" type="string" required>
+  Name of the certification or qualification
+</ParamField>
+
+### Response
+
+<ResponseField name="certificationId" type="integer">
+  Unique identifier for the certification
+</ResponseField>
+
+<ResponseField name="userId" type="integer">
+  ID of the guide user
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Certification name
+</ResponseField>
+
+## Get All Certifications
+
+<CodeGroup>
+```bash cURL
+curl https://api.kinconecta.com/api/guide_certifications
+```
+</CodeGroup>
+
+Retrieve all guide certifications in the system.
+
+### Response
+
+Returns an array of certification objects.
+
+## Get Certification by ID
+
+<CodeGroup>
+```bash cURL
+curl https://api.kinconecta.com/api/guide_certifications/123
+```
+</CodeGroup>
+
+Retrieve a specific certification by its ID.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The certification ID
+</ParamField>
+
+### Response
+
+Returns a single certification object.
+
+## Update Certification
+
+<CodeGroup>
+```bash cURL
+curl -X PUT https://api.kinconecta.com/api/guide_certifications/123 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Advanced Certified Tourist Guide - Level 2"
+  }'
+```
+</CodeGroup>
+
+Update an existing certification.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The certification ID
+</ParamField>
+
+### Request Body
+
+<ParamField body="userId" type="integer">
+  Updated guide user ID
+</ParamField>
+
+<ParamField body="name" type="string">
+  Updated certification name
+</ParamField>
+
+### Response
+
+Returns the updated certification object.
+
+## Delete Certification
+
+<CodeGroup>
+```bash cURL
+curl -X DELETE https://api.kinconecta.com/api/guide_certifications/123
+```
+</CodeGroup>
+
+Delete a certification by its ID.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The certification ID
+</ParamField>
+
+### Response
+
+Returns 204 No Content on successful deletion.

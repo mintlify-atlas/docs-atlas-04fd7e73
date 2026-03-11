@@ -1,0 +1,202 @@
+---
+title: 'Tour Categories'
+description: 'Manage tour categories and types of experiences'
+---
+
+## Create Tour Category
+
+<api method="POST" path="/api/tour_categories">
+Creates a new tour category.
+
+### Request Body
+
+<ParamField body="name" type="String" required>
+  Name of the tour category (e.g., "Cultural", "Adventure", "Culinary", "Nature")
+</ParamField>
+
+### Response
+
+<ResponseField name="categoryId" type="Integer">
+  Unique identifier for the category
+</ResponseField>
+
+<ResponseField name="name" type="String">
+  Category name
+</ResponseField>
+
+### Example Request
+
+```bash
+curl -X POST http://localhost:8080/api/tour_categories \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Cultural Heritage"
+  }'
+```
+
+### Example Response
+
+```json
+{
+  "categoryId": 5,
+  "name": "Cultural Heritage"
+}
+```
+
+</api>
+
+## Get All Tour Categories
+
+<api method="GET" path="/api/tour_categories">
+Retrieves all tour categories in the system.
+
+### Response
+
+Returns an array of tour category objects.
+
+### Example Request
+
+```bash
+curl http://localhost:8080/api/tour_categories
+```
+
+### Example Response
+
+```json
+[
+  {
+    "categoryId": 1,
+    "name": "Adventure"
+  },
+  {
+    "categoryId": 2,
+    "name": "Cultural"
+  },
+  {
+    "categoryId": 3,
+    "name": "Culinary"
+  },
+  {
+    "categoryId": 4,
+    "name": "Nature"
+  },
+  {
+    "categoryId": 5,
+    "name": "Cultural Heritage"
+  }
+]
+```
+
+</api>
+
+## Get Tour Category by ID
+
+<api method="GET" path="/api/tour_categories/{id}">
+Retrieves a specific tour category by its ID.
+
+### Path Parameters
+
+<ParamField path="id" type="Integer" required>
+  The unique identifier of the tour category
+</ParamField>
+
+### Response
+
+Returns a single tour category object.
+
+### Example Request
+
+```bash
+curl http://localhost:8080/api/tour_categories/5
+```
+
+### Example Response
+
+```json
+{
+  "categoryId": 5,
+  "name": "Cultural Heritage"
+}
+```
+
+</api>
+
+## Update Tour Category
+
+<api method="PUT" path="/api/tour_categories/{id}">
+Updates an existing tour category.
+
+### Path Parameters
+
+<ParamField path="id" type="Integer" required>
+  The unique identifier of the tour category to update
+</ParamField>
+
+### Request Body
+
+<ParamField body="name" type="String" required>
+  Updated name for the tour category
+</ParamField>
+
+### Response
+
+Returns the updated tour category object.
+
+### Example Request
+
+```bash
+curl -X PUT http://localhost:8080/api/tour_categories/5 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Cultural & Heritage"
+  }'
+```
+
+### Example Response
+
+```json
+{
+  "categoryId": 5,
+  "name": "Cultural & Heritage"
+}
+```
+
+</api>
+
+## Delete Tour Category
+
+<api method="DELETE" path="/api/tour_categories/{id}">
+Deletes a tour category from the system.
+
+### Path Parameters
+
+<ParamField path="id" type="Integer" required>
+  The unique identifier of the tour category to delete
+</ParamField>
+
+### Response
+
+Returns HTTP 204 No Content on successful deletion.
+
+### Example Request
+
+```bash
+curl -X DELETE http://localhost:8080/api/tour_categories/5
+```
+
+</api>
+
+## Common Tour Categories
+
+Here are some typical tour categories you might use in the Kin Conecta platform:
+
+- **Adventure** - Hiking, climbing, zip-lining, extreme sports
+- **Cultural** - Museums, historical sites, local traditions
+- **Culinary** - Food tours, cooking classes, market visits
+- **Nature** - Wildlife watching, botanical gardens, eco-tours
+- **Archaeological** - Ancient ruins, pyramids, historical excavations
+- **Urban** - City walks, architecture tours, street art
+- **Religious** - Churches, temples, spiritual sites
+- **Nightlife** - Evening entertainment, bars, shows
+- **Water Activities** - Snorkeling, diving, boat tours
+- **Wellness** - Yoga retreats, spa experiences, meditation

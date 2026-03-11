@@ -1,0 +1,283 @@
+---
+title: Users
+description: User management endpoints for creating and managing user accounts
+---
+
+## Overview
+
+The Users API provides endpoints for managing user accounts in the Kin Conecta platform. Users can have different roles (TOURIST, GUIDE, or ADMIN) and contain core account information including authentication details, contact information, and preferences.
+
+## User Object
+
+The User object represents a platform user account with the following structure:
+
+<ResponseField name="userId" type="Long">
+  Unique identifier for the user
+</ResponseField>
+
+<ResponseField name="role" type="UserRole">
+  User role: `TOURIST`, `GUIDE`, or `ADMIN`
+</ResponseField>
+
+<ResponseField name="fullName" type="string">
+  User's full name
+</ResponseField>
+
+<ResponseField name="dateOfBirth" type="date">
+  User's date of birth in ISO 8601 format (YYYY-MM-DD)
+</ResponseField>
+
+<ResponseField name="email" type="string">
+  User's email address
+</ResponseField>
+
+<ResponseField name="passwordHash" type="string">
+  Hashed password (never send plaintext passwords)
+</ResponseField>
+
+<ResponseField name="countryCode" type="string">
+  ISO country code for the user's location
+</ResponseField>
+
+<ResponseField name="phoneNumber" type="string">
+  User's phone number
+</ResponseField>
+
+<ResponseField name="phoneE164" type="string">
+  Phone number in E.164 format
+</ResponseField>
+
+<ResponseField name="preferredLanguageCode" type="string">
+  User's preferred language code (references Language entity)
+</ResponseField>
+
+<ResponseField name="accountStatus" type="UserAccountStatus">
+  Account status: `PENDING`, `ACTIVE`, `SUSPENDED`, or `DELETED`
+</ResponseField>
+
+<ResponseField name="emailVerifiedAt" type="datetime">
+  Timestamp when email was verified (ISO 8601 format)
+</ResponseField>
+
+<ResponseField name="lastLoginAt" type="datetime">
+  Timestamp of last login (ISO 8601 format)
+</ResponseField>
+
+<ResponseField name="createdAt" type="datetime">
+  Timestamp when user was created (ISO 8601 format)
+</ResponseField>
+
+<ResponseField name="updatedAt" type="datetime">
+  Timestamp when user was last updated (ISO 8601 format)
+</ResponseField>
+
+## Create User
+
+<CodeGroup>
+```bash cURL
+curl -X POST http://localhost:8080/api/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "role": "TOURIST",
+    "fullName": "Maria Garcia",
+    "dateOfBirth": "1995-06-15",
+    "email": "maria.garcia@example.com",
+    "passwordHash": "$2a$10$N9qo8uLOickgx2ZMRZoMye",
+    "countryCode": "MX",
+    "phoneNumber": "+52 55 1234 5678",
+    "phoneE164": "+525512345678",
+    "preferredLanguageCode": "es",
+    "accountStatus": "PENDING",
+    "createdAt": "2024-03-11T10:30:00Z"
+  }'
+```
+</CodeGroup>
+
+<ParamField path="role" type="UserRole" required>
+  User role: `TOURIST`, `GUIDE`, or `ADMIN`
+</ParamField>
+
+<ParamField path="fullName" type="string" required>
+  User's full name
+</ParamField>
+
+<ParamField path="dateOfBirth" type="date">
+  User's date of birth
+</ParamField>
+
+<ParamField path="email" type="string" required>
+  User's email address
+</ParamField>
+
+<ParamField path="passwordHash" type="string" required>
+  Hashed password
+</ParamField>
+
+<ParamField path="countryCode" type="string">
+  ISO country code
+</ParamField>
+
+<ParamField path="phoneNumber" type="string">
+  Phone number
+</ParamField>
+
+<ParamField path="phoneE164" type="string">
+  Phone number in E.164 format
+</ParamField>
+
+<ParamField path="preferredLanguageCode" type="string">
+  Preferred language code
+</ParamField>
+
+<ParamField path="accountStatus" type="UserAccountStatus">
+  Account status (default: PENDING)
+</ParamField>
+
+### Response
+
+```json
+{
+  "userId": 1,
+  "role": "TOURIST",
+  "fullName": "Maria Garcia",
+  "dateOfBirth": "1995-06-15",
+  "email": "maria.garcia@example.com",
+  "passwordHash": "$2a$10$N9qo8uLOickgx2ZMRZoMye",
+  "countryCode": "MX",
+  "phoneNumber": "+52 55 1234 5678",
+  "phoneE164": "+525512345678",
+  "preferredLanguageCode": "es",
+  "accountStatus": "PENDING",
+  "emailVerifiedAt": null,
+  "lastLoginAt": null,
+  "createdAt": "2024-03-11T10:30:00Z",
+  "updatedAt": null
+}
+```
+
+## Get All Users
+
+<CodeGroup>
+```bash cURL
+curl -X GET http://localhost:8080/api/users
+```
+</CodeGroup>
+
+Retrieves a list of all users in the system.
+
+### Response
+
+```json
+[
+  {
+    "userId": 1,
+    "role": "TOURIST",
+    "fullName": "Maria Garcia",
+    "email": "maria.garcia@example.com",
+    "accountStatus": "ACTIVE",
+    "createdAt": "2024-03-11T10:30:00Z"
+  },
+  {
+    "userId": 2,
+    "role": "GUIDE",
+    "fullName": "Carlos Rodriguez",
+    "email": "carlos.rodriguez@example.com",
+    "accountStatus": "ACTIVE",
+    "createdAt": "2024-03-10T14:20:00Z"
+  }
+]
+```
+
+## Get User by ID
+
+<CodeGroup>
+```bash cURL
+curl -X GET http://localhost:8080/api/users/1
+```
+</CodeGroup>
+
+Retrieves a specific user by their ID.
+
+### Response
+
+```json
+{
+  "userId": 1,
+  "role": "TOURIST",
+  "fullName": "Maria Garcia",
+  "dateOfBirth": "1995-06-15",
+  "email": "maria.garcia@example.com",
+  "passwordHash": "$2a$10$N9qo8uLOickgx2ZMRZoMye",
+  "countryCode": "MX",
+  "phoneNumber": "+52 55 1234 5678",
+  "phoneE164": "+525512345678",
+  "preferredLanguageCode": "es",
+  "accountStatus": "ACTIVE",
+  "emailVerifiedAt": "2024-03-11T11:00:00Z",
+  "lastLoginAt": "2024-03-15T09:30:00Z",
+  "createdAt": "2024-03-11T10:30:00Z",
+  "updatedAt": "2024-03-15T09:30:00Z"
+}
+```
+
+## Update User
+
+<CodeGroup>
+```bash cURL
+curl -X PUT http://localhost:8080/api/users/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "role": "TOURIST",
+    "fullName": "Maria Isabel Garcia",
+    "dateOfBirth": "1995-06-15",
+    "email": "maria.garcia@example.com",
+    "countryCode": "MX",
+    "phoneNumber": "+52 55 9876 5432",
+    "phoneE164": "+525598765432",
+    "preferredLanguageCode": "es",
+    "accountStatus": "ACTIVE",
+    "updatedAt": "2024-03-15T10:00:00Z"
+  }'
+```
+</CodeGroup>
+
+Updates an existing user's information. All fields from the create request can be updated.
+
+### Response
+
+```json
+{
+  "userId": 1,
+  "role": "TOURIST",
+  "fullName": "Maria Isabel Garcia",
+  "dateOfBirth": "1995-06-15",
+  "email": "maria.garcia@example.com",
+  "countryCode": "MX",
+  "phoneNumber": "+52 55 9876 5432",
+  "phoneE164": "+525598765432",
+  "preferredLanguageCode": "es",
+  "accountStatus": "ACTIVE",
+  "emailVerifiedAt": "2024-03-11T11:00:00Z",
+  "lastLoginAt": "2024-03-15T09:30:00Z",
+  "createdAt": "2024-03-11T10:30:00Z",
+  "updatedAt": "2024-03-15T10:00:00Z"
+}
+```
+
+## Delete User
+
+<CodeGroup>
+```bash cURL
+curl -X DELETE http://localhost:8080/api/users/1
+```
+</CodeGroup>
+
+Deletes a user from the system. This is typically a soft delete that updates the `accountStatus` to `DELETED`.
+
+### Response
+
+```json
+{
+  "message": "User deleted successfully"
+}
+```

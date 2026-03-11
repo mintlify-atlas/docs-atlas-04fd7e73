@@ -1,0 +1,404 @@
+---
+title: 'Trip Bookings'
+description: 'Manage trip bookings and reservation status'
+---
+
+## Create Trip Booking
+
+<api method="POST" path="/api/trip_bookings">
+Creates a new trip booking.
+
+### Request Body
+
+<ParamField body="tourId" type="Long" required>
+  ID of the tour being booked
+</ParamField>
+
+<ParamField body="touristId" type="Long" required>
+  ID of the tourist making the booking
+</ParamField>
+
+<ParamField body="guideId" type="Long" required>
+  ID of the guide leading the tour
+</ParamField>
+
+<ParamField body="startDatetime" type="LocalDateTime" required>
+  Start date and time of the trip (format: "2026-03-15T09:00:00")
+</ParamField>
+
+<ParamField body="endDatetime" type="LocalDateTime" required>
+  End date and time of the trip (format: "2026-03-15T14:30:00")
+</ParamField>
+
+<ParamField body="status" type="String" required>
+  Booking status. Options: `PENDING`, `CONFIRMED`, `COMPLETED`, `CANCELLED`, `CHANGE_REQUESTED`
+</ParamField>
+
+<ParamField body="cancelReason" type="String">
+  Reason for cancellation (if status is CANCELLED)
+</ParamField>
+
+<ParamField body="notes" type="String">
+  Additional notes or special requests from the tourist
+</ParamField>
+
+<ParamField body="createdAt" type="LocalDateTime">
+  Timestamp when the booking was created
+</ParamField>
+
+<ParamField body="updatedAt" type="LocalDateTime">
+  Timestamp when the booking was last updated
+</ParamField>
+
+### Response
+
+<ResponseField name="tripId" type="Long">
+  Unique identifier for the trip booking
+</ResponseField>
+
+<ResponseField name="tourId" type="Long">
+  ID of the booked tour
+</ResponseField>
+
+<ResponseField name="touristId" type="Long">
+  ID of the tourist
+</ResponseField>
+
+<ResponseField name="guideId" type="Long">
+  ID of the guide
+</ResponseField>
+
+<ResponseField name="startDatetime" type="LocalDateTime">
+  Trip start date and time
+</ResponseField>
+
+<ResponseField name="endDatetime" type="LocalDateTime">
+  Trip end date and time
+</ResponseField>
+
+<ResponseField name="status" type="String">
+  Current booking status
+</ResponseField>
+
+<ResponseField name="cancelReason" type="String">
+  Cancellation reason (if applicable)
+</ResponseField>
+
+<ResponseField name="notes" type="String">
+  Booking notes
+</ResponseField>
+
+<ResponseField name="createdAt" type="LocalDateTime">
+  Creation timestamp
+</ResponseField>
+
+<ResponseField name="updatedAt" type="LocalDateTime">
+  Last update timestamp
+</ResponseField>
+
+### Example Request
+
+```bash
+curl -X POST http://localhost:8080/api/trip_bookings \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tourId": 123,
+    "touristId": 456,
+    "guideId": 1,
+    "startDatetime": "2026-03-15T09:00:00",
+    "endDatetime": "2026-03-15T14:30:00",
+    "status": "PENDING",
+    "notes": "Group of 4 people, one person uses wheelchair"
+  }'
+```
+
+### Example Response
+
+```json
+{
+  "tripId": 789,
+  "tourId": 123,
+  "touristId": 456,
+  "guideId": 1,
+  "startDatetime": "2026-03-15T09:00:00",
+  "endDatetime": "2026-03-15T14:30:00",
+  "status": "PENDING",
+  "cancelReason": null,
+  "notes": "Group of 4 people, one person uses wheelchair",
+  "createdAt": "2026-03-11T10:30:00",
+  "updatedAt": "2026-03-11T10:30:00"
+}
+```
+
+</api>
+
+## Get All Trip Bookings
+
+<api method="GET" path="/api/trip_bookings">
+Retrieves all trip bookings in the system.
+
+### Response
+
+Returns an array of trip booking objects.
+
+### Example Request
+
+```bash
+curl http://localhost:8080/api/trip_bookings
+```
+
+### Example Response
+
+```json
+[
+  {
+    "tripId": 789,
+    "tourId": 123,
+    "touristId": 456,
+    "guideId": 1,
+    "startDatetime": "2026-03-15T09:00:00",
+    "endDatetime": "2026-03-15T14:30:00",
+    "status": "CONFIRMED",
+    "cancelReason": null,
+    "notes": "Group of 4 people, one person uses wheelchair",
+    "createdAt": "2026-03-11T10:30:00",
+    "updatedAt": "2026-03-11T11:15:00"
+  },
+  {
+    "tripId": 790,
+    "tourId": 124,
+    "touristId": 457,
+    "guideId": 2,
+    "startDatetime": "2026-03-16T07:00:00",
+    "endDatetime": "2026-03-16T13:00:00",
+    "status": "PENDING",
+    "cancelReason": null,
+    "notes": "First time visiting pyramids",
+    "createdAt": "2026-03-11T14:20:00",
+    "updatedAt": "2026-03-11T14:20:00"
+  }
+]
+```
+
+</api>
+
+## Get Trip Booking by ID
+
+<api method="GET" path="/api/trip_bookings/{id}">
+Retrieves a specific trip booking by its ID.
+
+### Path Parameters
+
+<ParamField path="id" type="Long" required>
+  The unique identifier of the trip booking
+</ParamField>
+
+### Response
+
+Returns a single trip booking object.
+
+### Example Request
+
+```bash
+curl http://localhost:8080/api/trip_bookings/789
+```
+
+### Example Response
+
+```json
+{
+  "tripId": 789,
+  "tourId": 123,
+  "touristId": 456,
+  "guideId": 1,
+  "startDatetime": "2026-03-15T09:00:00",
+  "endDatetime": "2026-03-15T14:30:00",
+  "status": "CONFIRMED",
+  "cancelReason": null,
+  "notes": "Group of 4 people, one person uses wheelchair",
+  "createdAt": "2026-03-11T10:30:00",
+  "updatedAt": "2026-03-11T11:15:00"
+}
+```
+
+</api>
+
+## Update Trip Booking
+
+<api method="PUT" path="/api/trip_bookings/{id}">
+Updates an existing trip booking.
+
+### Path Parameters
+
+<ParamField path="id" type="Long" required>
+  The unique identifier of the trip booking to update
+</ParamField>
+
+### Request Body
+
+All fields are optional - only send the fields you want to update.
+
+<ParamField body="tourId" type="Long">
+  ID of the tour
+</ParamField>
+
+<ParamField body="touristId" type="Long">
+  ID of the tourist
+</ParamField>
+
+<ParamField body="guideId" type="Long">
+  ID of the guide
+</ParamField>
+
+<ParamField body="startDatetime" type="LocalDateTime">
+  Trip start date and time
+</ParamField>
+
+<ParamField body="endDatetime" type="LocalDateTime">
+  Trip end date and time
+</ParamField>
+
+<ParamField body="status" type="String">
+  Booking status. Options: `PENDING`, `CONFIRMED`, `COMPLETED`, `CANCELLED`, `CHANGE_REQUESTED`
+</ParamField>
+
+<ParamField body="cancelReason" type="String">
+  Reason for cancellation
+</ParamField>
+
+<ParamField body="notes" type="String">
+  Booking notes
+</ParamField>
+
+### Response
+
+Returns the updated trip booking object.
+
+### Example Request
+
+```bash
+curl -X PUT http://localhost:8080/api/trip_bookings/789 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "status": "CONFIRMED"
+  }'
+```
+
+### Example Response
+
+```json
+{
+  "tripId": 789,
+  "tourId": 123,
+  "touristId": 456,
+  "guideId": 1,
+  "startDatetime": "2026-03-15T09:00:00",
+  "endDatetime": "2026-03-15T14:30:00",
+  "status": "CONFIRMED",
+  "cancelReason": null,
+  "notes": "Group of 4 people, one person uses wheelchair",
+  "createdAt": "2026-03-11T10:30:00",
+  "updatedAt": "2026-03-11T11:15:00"
+}
+```
+
+</api>
+
+## Cancel Trip Booking
+
+<api method="PUT" path="/api/trip_bookings/{id}">
+Cancels a trip booking by updating its status to CANCELLED.
+
+### Path Parameters
+
+<ParamField path="id" type="Long" required>
+  The unique identifier of the trip booking to cancel
+</ParamField>
+
+### Request Body
+
+<ParamField body="status" type="String" required>
+  Set to "CANCELLED"
+</ParamField>
+
+<ParamField body="cancelReason" type="String" required>
+  Reason for the cancellation
+</ParamField>
+
+### Response
+
+Returns the updated trip booking object with cancelled status.
+
+### Example Request
+
+```bash
+curl -X PUT http://localhost:8080/api/trip_bookings/789 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "status": "CANCELLED",
+    "cancelReason": "Tourist had a family emergency and cannot attend"
+  }'
+```
+
+### Example Response
+
+```json
+{
+  "tripId": 789,
+  "tourId": 123,
+  "touristId": 456,
+  "guideId": 1,
+  "startDatetime": "2026-03-15T09:00:00",
+  "endDatetime": "2026-03-15T14:30:00",
+  "status": "CANCELLED",
+  "cancelReason": "Tourist had a family emergency and cannot attend",
+  "notes": "Group of 4 people, one person uses wheelchair",
+  "createdAt": "2026-03-11T10:30:00",
+  "updatedAt": "2026-03-11T16:45:00"
+}
+```
+
+</api>
+
+## Delete Trip Booking
+
+<api method="DELETE" path="/api/trip_bookings/{id}">
+Deletes a trip booking from the system.
+
+### Path Parameters
+
+<ParamField path="id" type="Long" required>
+  The unique identifier of the trip booking to delete
+</ParamField>
+
+### Response
+
+Returns HTTP 204 No Content on successful deletion.
+
+### Example Request
+
+```bash
+curl -X DELETE http://localhost:8080/api/trip_bookings/789
+```
+
+</api>
+
+## Booking Status Flow
+
+Trip bookings typically follow this status progression:
+
+1. **PENDING** - Initial state when a booking is created, awaiting guide confirmation
+2. **CONFIRMED** - Guide has accepted the booking and it's scheduled
+3. **CHANGE_REQUESTED** - Tourist or guide has requested changes to the booking details
+4. **COMPLETED** - The trip has been successfully completed
+5. **CANCELLED** - The booking has been cancelled by either party
+
+### Status Transitions
+
+- `PENDING` → `CONFIRMED` (when guide confirms)
+- `PENDING` → `CANCELLED` (if declined or cancelled before confirmation)
+- `CONFIRMED` → `CHANGE_REQUESTED` (when changes are needed)
+- `CONFIRMED` → `COMPLETED` (after the trip is finished)
+- `CONFIRMED` → `CANCELLED` (if cancelled after confirmation)
+- `CHANGE_REQUESTED` → `CONFIRMED` (when changes are accepted)
+- `CHANGE_REQUESTED` → `CANCELLED` (if changes are rejected)

@@ -1,0 +1,418 @@
+---
+title: 'FAQ'
+description: 'API endpoints for managing FAQ categories and items'
+---
+
+## FAQ Categories
+
+Manage frequently asked question categories organized by user role.
+
+### Create FAQ Category
+
+<ParamField path="POST" type="endpoint">
+  `/api/faq_categories`
+</ParamField>
+
+Creates a new FAQ category.
+
+**Request Body**
+
+<ParamField body="name" type="string" required>
+  Name of the FAQ category
+</ParamField>
+
+<ParamField body="roleScope" type="enum" required>
+  Target user role. Values: `GUIDE`, `TOURIST`, `BOTH`
+</ParamField>
+
+<ParamField body="sortOrder" type="integer">
+  Display order for the category (lower numbers appear first)
+</ParamField>
+
+**Response**
+
+<ResponseField name="faqCategoryId" type="integer">
+  Unique identifier for the FAQ category
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Category name
+</ResponseField>
+
+<ResponseField name="roleScope" type="enum">
+  Target user role: `GUIDE`, `TOURIST`, or `BOTH`
+</ResponseField>
+
+<ResponseField name="sortOrder" type="integer">
+  Display order
+</ResponseField>
+
+**Example Request**
+
+```bash
+curl -X POST http://localhost:8080/api/faq_categories \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Reservaciones y Pagos",
+    "roleScope": "TOURIST",
+    "sortOrder": 1
+  }'
+```
+
+**Example Response**
+
+```json
+{
+  "faqCategoryId": 5,
+  "name": "Reservaciones y Pagos",
+  "roleScope": "TOURIST",
+  "sortOrder": 1
+}
+```
+
+---
+
+### Get All FAQ Categories
+
+<ParamField path="GET" type="endpoint">
+  `/api/faq_categories`
+</ParamField>
+
+Retrieves all FAQ categories.
+
+**Example Request**
+
+```bash
+curl http://localhost:8080/api/faq_categories
+```
+
+**Example Response**
+
+```json
+[
+  {
+    "faqCategoryId": 5,
+    "name": "Reservaciones y Pagos",
+    "roleScope": "TOURIST",
+    "sortOrder": 1
+  },
+  {
+    "faqCategoryId": 6,
+    "name": "Gestión de Tours",
+    "roleScope": "GUIDE",
+    "sortOrder": 1
+  },
+  {
+    "faqCategoryId": 7,
+    "name": "Cuenta y Seguridad",
+    "roleScope": "BOTH",
+    "sortOrder": 2
+  }
+]
+```
+
+---
+
+### Get FAQ Category by ID
+
+<ParamField path="GET" type="endpoint">
+  `/api/faq_categories/{id}`
+</ParamField>
+
+Retrieves a specific FAQ category by ID.
+
+**Path Parameters**
+
+<ParamField path="id" type="integer" required>
+  The FAQ category ID
+</ParamField>
+
+**Example Request**
+
+```bash
+curl http://localhost:8080/api/faq_categories/5
+```
+
+**Example Response**
+
+```json
+{
+  "faqCategoryId": 5,
+  "name": "Reservaciones y Pagos",
+  "roleScope": "TOURIST",
+  "sortOrder": 1
+}
+```
+
+---
+
+### Update FAQ Category
+
+<ParamField path="PUT" type="endpoint">
+  `/api/faq_categories/{id}`
+</ParamField>
+
+Updates an existing FAQ category.
+
+**Path Parameters**
+
+<ParamField path="id" type="integer" required>
+  The FAQ category ID
+</ParamField>
+
+**Request Body**
+
+Same fields as Create FAQ Category.
+
+**Example Request**
+
+```bash
+curl -X PUT http://localhost:8080/api/faq_categories/5 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Reservaciones, Pagos y Cancelaciones",
+    "roleScope": "TOURIST",
+    "sortOrder": 1
+  }'
+```
+
+---
+
+### Delete FAQ Category
+
+<ParamField path="DELETE" type="endpoint">
+  `/api/faq_categories/{id}`
+</ParamField>
+
+Deletes an FAQ category.
+
+**Path Parameters**
+
+<ParamField path="id" type="integer" required>
+  The FAQ category ID
+</ParamField>
+
+**Example Request**
+
+```bash
+curl -X DELETE http://localhost:8080/api/faq_categories/5
+```
+
+---
+
+## FAQ Items
+
+Manage individual FAQ questions and answers.
+
+### Create FAQ Item
+
+<ParamField path="POST" type="endpoint">
+  `/api/faq_items`
+</ParamField>
+
+Creates a new FAQ item (question and answer pair).
+
+**Request Body**
+
+<ParamField body="faqCategoryId" type="integer" required>
+  ID of the parent FAQ category
+</ParamField>
+
+<ParamField body="question" type="string" required>
+  The FAQ question
+</ParamField>
+
+<ParamField body="answer" type="string" required>
+  The answer to the question
+</ParamField>
+
+<ParamField body="isActive" type="boolean">
+  Whether this FAQ item is active/visible. Default: `true`
+</ParamField>
+
+<ParamField body="sortOrder" type="integer">
+  Display order within the category (lower numbers appear first)
+</ParamField>
+
+**Response**
+
+<ResponseField name="faqItemId" type="integer">
+  Unique identifier for the FAQ item
+</ResponseField>
+
+<ResponseField name="faqCategoryId" type="integer">
+  Parent category ID
+</ResponseField>
+
+<ResponseField name="question" type="string">
+  The question
+</ResponseField>
+
+<ResponseField name="answer" type="string">
+  The answer
+</ResponseField>
+
+<ResponseField name="isActive" type="boolean">
+  Active status
+</ResponseField>
+
+<ResponseField name="sortOrder" type="integer">
+  Display order
+</ResponseField>
+
+**Example Request**
+
+```bash
+curl -X POST http://localhost:8080/api/faq_items \
+  -H "Content-Type: application/json" \
+  -d '{
+    "faqCategoryId": 5,
+    "question": "¿Cómo puedo cancelar mi reservación?",
+    "answer": "Puedes cancelar tu reservación desde tu panel de control. Las políticas de cancelación varían según el tour y el guía. Revisa los términos específicos en tu confirmación de reserva.",
+    "isActive": true,
+    "sortOrder": 1
+  }'
+```
+
+**Example Response**
+
+```json
+{
+  "faqItemId": 142,
+  "faqCategoryId": 5,
+  "question": "¿Cómo puedo cancelar mi reservación?",
+  "answer": "Puedes cancelar tu reservación desde tu panel de control. Las políticas de cancelación varían según el tour y el guía. Revisa los términos específicos en tu confirmación de reserva.",
+  "isActive": true,
+  "sortOrder": 1
+}
+```
+
+---
+
+### Get All FAQ Items
+
+<ParamField path="GET" type="endpoint">
+  `/api/faq_items`
+</ParamField>
+
+Retrieves all FAQ items.
+
+**Example Request**
+
+```bash
+curl http://localhost:8080/api/faq_items
+```
+
+**Example Response**
+
+```json
+[
+  {
+    "faqItemId": 142,
+    "faqCategoryId": 5,
+    "question": "¿Cómo puedo cancelar mi reservación?",
+    "answer": "Puedes cancelar tu reservación desde tu panel de control.",
+    "isActive": true,
+    "sortOrder": 1
+  },
+  {
+    "faqItemId": 143,
+    "faqCategoryId": 5,
+    "question": "¿Cuándo recibiré mi reembolso?",
+    "answer": "Los reembolsos se procesan en 5-7 días hábiles.",
+    "isActive": true,
+    "sortOrder": 2
+  }
+]
+```
+
+---
+
+### Get FAQ Item by ID
+
+<ParamField path="GET" type="endpoint">
+  `/api/faq_items/{id}`
+</ParamField>
+
+Retrieves a specific FAQ item by ID.
+
+**Path Parameters**
+
+<ParamField path="id" type="integer" required>
+  The FAQ item ID
+</ParamField>
+
+**Example Request**
+
+```bash
+curl http://localhost:8080/api/faq_items/142
+```
+
+**Example Response**
+
+```json
+{
+  "faqItemId": 142,
+  "faqCategoryId": 5,
+  "question": "¿Cómo puedo cancelar mi reservación?",
+  "answer": "Puedes cancelar tu reservación desde tu panel de control. Las políticas de cancelación varían según el tour y el guía.",
+  "isActive": true,
+  "sortOrder": 1
+}
+```
+
+---
+
+### Update FAQ Item
+
+<ParamField path="PUT" type="endpoint">
+  `/api/faq_items/{id}`
+</ParamField>
+
+Updates an existing FAQ item.
+
+**Path Parameters**
+
+<ParamField path="id" type="integer" required>
+  The FAQ item ID
+</ParamField>
+
+**Request Body**
+
+Same fields as Create FAQ Item.
+
+**Example Request**
+
+```bash
+curl -X PUT http://localhost:8080/api/faq_items/142 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "faqCategoryId": 5,
+    "question": "¿Cómo puedo cancelar mi reservación?",
+    "answer": "Puedes cancelar tu reservación hasta 24 horas antes del tour desde tu panel de control.",
+    "isActive": true,
+    "sortOrder": 1
+  }'
+```
+
+---
+
+### Delete FAQ Item
+
+<ParamField path="DELETE" type="endpoint">
+  `/api/faq_items/{id}`
+</ParamField>
+
+Deletes an FAQ item.
+
+**Path Parameters**
+
+<ParamField path="id" type="integer" required>
+  The FAQ item ID
+</ParamField>
+
+**Example Request**
+
+```bash
+curl -X DELETE http://localhost:8080/api/faq_items/142
+```

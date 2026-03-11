@@ -1,0 +1,262 @@
+---
+title: "Favorite Tours"
+description: "Manage tourist favorites for tours using composite keys"
+---
+
+## Overview
+
+The Favorite Tours API allows tourists to save their favorite tours for easy reference and future booking. This resource uses a composite key consisting of `touristId` and `tourId` to uniquely identify favorite relationships.
+
+## Composite Key Structure
+
+Favorite tour records are identified by a composite primary key:
+
+- **touristId**: The ID of the tourist user
+- **tourId**: The ID of the tour
+
+This composite key ensures that each tourist-tour pair can only exist once in the system, preventing duplicate favorites.
+
+## Endpoints
+
+### Create Favorite Tour
+
+<CodeGroup>
+
+```bash curl
+curl -X POST http://localhost:8080/api/favorite_tours \
+  -H "Content-Type: application/json" \
+  -d '{
+    "touristId": 123,
+    "tourId": 789
+  }'
+```
+
+</CodeGroup>
+
+Adds a tour to a tourist's favorites list.
+
+<ParamField body="touristId" type="Long" required>
+  The ID of the tourist user marking the tour as favorite
+</ParamField>
+
+<ParamField body="tourId" type="Long" required>
+  The ID of the tour being marked as favorite
+</ParamField>
+
+<ParamField body="createdAt" type="datetime">
+  Optional timestamp. If not provided, the server will set it automatically.
+</ParamField>
+
+<ResponseField name="touristId" type="Long">
+  The ID of the tourist user
+</ResponseField>
+
+<ResponseField name="tourId" type="Long">
+  The ID of the tour
+</ResponseField>
+
+<ResponseField name="createdAt" type="datetime">
+  Timestamp when the favorite was created
+</ResponseField>
+
+### Get All Favorite Tours
+
+<CodeGroup>
+
+```bash curl
+curl http://localhost:8080/api/favorite_tours
+```
+
+</CodeGroup>
+
+Retrieves a list of all favorite tour relationships.
+
+<ResponseField name="favorites" type="array">
+  Array of favorite tour objects
+</ResponseField>
+
+### Get Favorite Tour by Composite Key
+
+<CodeGroup>
+
+```bash curl
+curl http://localhost:8080/api/favorite_tours/123/789
+```
+
+</CodeGroup>
+
+Retrieves a specific favorite tour relationship using the composite key.
+
+<ParamField path="touristId" type="Long" required>
+  The ID of the tourist user
+</ParamField>
+
+<ParamField path="tourId" type="Long" required>
+  The ID of the tour
+</ParamField>
+
+<ResponseField name="touristId" type="Long">
+  The ID of the tourist user
+</ResponseField>
+
+<ResponseField name="tourId" type="Long">
+  The ID of the tour
+</ResponseField>
+
+<ResponseField name="createdAt" type="datetime">
+  Timestamp when the favorite was created
+</ResponseField>
+
+### Update Favorite Tour
+
+<CodeGroup>
+
+```bash curl
+curl -X PUT http://localhost:8080/api/favorite_tours/123/789 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "createdAt": "2024-03-15T14:30:00"
+  }'
+```
+
+</CodeGroup>
+
+Updates an existing favorite tour relationship. Typically used to update metadata like the creation timestamp.
+
+<ParamField path="touristId" type="Long" required>
+  The ID of the tourist user
+</ParamField>
+
+<ParamField path="tourId" type="Long" required>
+  The ID of the tour
+</ParamField>
+
+<ParamField body="createdAt" type="datetime">
+  Updated timestamp for when the favorite was created
+</ParamField>
+
+<ResponseField name="touristId" type="Long">
+  The ID of the tourist user
+</ResponseField>
+
+<ResponseField name="tourId" type="Long">
+  The ID of the tour
+</ResponseField>
+
+<ResponseField name="createdAt" type="datetime">
+  Updated timestamp
+</ResponseField>
+
+### Delete Favorite Tour
+
+<CodeGroup>
+
+```bash curl
+curl -X DELETE http://localhost:8080/api/favorite_tours/123/789
+```
+
+</CodeGroup>
+
+Removes a tour from a tourist's favorites list using the composite key.
+
+<ParamField path="touristId" type="Long" required>
+  The ID of the tourist user
+</ParamField>
+
+<ParamField path="tourId" type="Long" required>
+  The ID of the tour
+</ParamField>
+
+<ResponseField name="status" type="204">
+  No content returned on successful deletion
+</ResponseField>
+
+## Usage Examples
+
+### Check if Tour is Favorited
+
+To check if a specific tour is in a tourist's favorites:
+
+<CodeGroup>
+
+```bash curl
+curl http://localhost:8080/api/favorite_tours/123/789
+```
+
+</CodeGroup>
+
+- If the relationship exists, you'll receive a 200 response with the favorite data
+- If it doesn't exist, you'll receive a 404 error
+
+### Get Tourist's Favorite Tours
+
+To retrieve all tours favorited by a specific tourist, filter the results from the get all endpoint:
+
+<CodeGroup>
+
+```bash curl
+curl http://localhost:8080/api/favorite_tours | jq '.[] | select(.touristId == 123)'
+```
+
+</CodeGroup>
+
+### Get Tourists Who Favorited a Tour
+
+To see which tourists have favorited a specific tour (useful for analytics):
+
+<CodeGroup>
+
+```bash curl
+curl http://localhost:8080/api/favorite_tours | jq '.[] | select(.tourId == 789)'
+```
+
+</CodeGroup>
+
+### Toggle Favorite Status
+
+To implement a toggle favorite feature in your application:
+
+1. First, check if the tour is already favorited (GET request)
+2. If it exists (200 response), delete it (DELETE request)
+3. If it doesn't exist (404 response), create it (POST request)
+
+<CodeGroup>
+
+```bash Toggle Favorite Script
+#!/bin/bash
+
+TOURIST_ID=123
+TOUR_ID=789
+API_URL="http://localhost:8080/api/favorite_tours"
+
+# Check if favorite exists
+if curl -s -o /dev/null -w "%{http_code}" "$API_URL/$TOURIST_ID/$TOUR_ID" | grep -q "200"; then
+  # Delete if exists
+  curl -X DELETE "$API_URL/$TOURIST_ID/$TOUR_ID"
+  echo "Tour removed from favorites"
+else
+  # Create if doesn't exist
+  curl -X POST "$API_URL" \
+    -H "Content-Type: application/json" \
+    -d "{\"touristId\": $TOURIST_ID, \"tourId\": $TOUR_ID}"
+  echo "Tour added to favorites"
+fi
+```
+
+</CodeGroup>
+
+## Relationships
+
+The FavoriteTour entity maintains relationships with:
+
+- **Tourist User**: References the user table via `touristId` → `user_id`
+- **Tour**: References the tours table via `tourId` → `tour_id`
+
+Both IDs must reference valid records in their respective tables.
+
+## Use Cases
+
+- **Wishlist**: Tourists can build a wishlist of tours they're interested in
+- **Quick Access**: Easy retrieval of saved tours for comparison and booking
+- **Recommendations**: Analyze favorite patterns to improve tour recommendations
+- **Marketing**: Notify tourists about updates or deals on their favorited tours

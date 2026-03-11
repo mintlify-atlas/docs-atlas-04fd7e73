@@ -1,0 +1,395 @@
+---
+title: Guide Profiles
+description: Manage guide user profiles with expertise, certifications, and service offerings
+---
+
+## Overview
+
+The Guide Profiles API manages detailed profile information for guide users. Each guide profile contains professional information including expertise areas, certifications, service rates, locations, and tour preferences.
+
+## Guide Profile Object
+
+The Guide Profile object represents a professional tour guide profile:
+
+<ResponseField name="userId" type="Long">
+  References the user account (primary key)
+</ResponseField>
+
+<ResponseField name="summary" type="string">
+  Short professional summary
+</ResponseField>
+
+<ResponseField name="story" type="string">
+  Detailed background story and experience
+</ResponseField>
+
+<ResponseField name="statusText" type="string">
+  Current availability status text
+</ResponseField>
+
+<ResponseField name="hourlyRate" type="BigDecimal">
+  Hourly service rate
+</ResponseField>
+
+<ResponseField name="currency" type="string">
+  Currency code (e.g., USD, MXN, EUR)
+</ResponseField>
+
+<ResponseField name="ratingAvg" type="BigDecimal">
+  Average rating from reviews
+</ResponseField>
+
+<ResponseField name="reviewsCount" type="Integer">
+  Total number of reviews received
+</ResponseField>
+
+<ResponseField name="locationLabel" type="string">
+  Primary location or region
+</ResponseField>
+
+<ResponseField name="experienceLevel" type="string">
+  Experience level (e.g., Expert, Intermediate, Beginner)
+</ResponseField>
+
+<ResponseField name="style" type="string">
+  Tour guiding style
+</ResponseField>
+
+<ResponseField name="groupSize" type="string">
+  Preferred or maximum group size
+</ResponseField>
+
+<ResponseField name="tourIntensity" type="string">
+  Tour intensity level
+</ResponseField>
+
+<ResponseField name="transportOffered" type="string">
+  Transportation options provided
+</ResponseField>
+
+<ResponseField name="photoStyle" type="string">
+  Photography services or style offered
+</ResponseField>
+
+<ResponseField name="additionalNotes" type="string">
+  Additional information or notes
+</ResponseField>
+
+<ResponseField name="avatarUrl" type="string">
+  URL to profile avatar image
+</ResponseField>
+
+<ResponseField name="coverUrl" type="string">
+  URL to profile cover image
+</ResponseField>
+
+<ResponseField name="postText" type="string">
+  Featured post text content
+</ResponseField>
+
+<ResponseField name="postImageUrl" type="string">
+  URL to featured post image
+</ResponseField>
+
+<ResponseField name="postCaption" type="string">
+  Caption for featured post
+</ResponseField>
+
+<ResponseField name="postPublishedAt" type="datetime">
+  Timestamp when post was published
+</ResponseField>
+
+<ResponseField name="updatedAt" type="datetime">
+  Last update timestamp
+</ResponseField>
+
+## Create Guide Profile
+
+<CodeGroup>
+```bash cURL
+curl -X POST http://localhost:8080/api/guide_profiles \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 2,
+    "summary": "Expert cultural and historical guide with 10+ years experience",
+    "story": "Born and raised in Mexico City, I have been sharing the rich history and vibrant culture of my city with travelers from around the world for over a decade. My passion for archaeology and anthropology brings ancient civilizations to life.",
+    "statusText": "Available for bookings",
+    "hourlyRate": 45.00,
+    "currency": "USD",
+    "ratingAvg": 4.9,
+    "reviewsCount": 127,
+    "locationLabel": "Mexico City & surroundings",
+    "experienceLevel": "Expert",
+    "style": "Interactive & Educational",
+    "groupSize": "Up to 12 people",
+    "tourIntensity": "Moderate",
+    "transportOffered": "Private vehicle available",
+    "photoStyle": "Professional photos included",
+    "additionalNotes": "Specialized in pre-Hispanic history and archaeology",
+    "avatarUrl": "https://example.com/avatars/carlos.jpg",
+    "coverUrl": "https://example.com/covers/carlos-teotihuacan.jpg"
+  }'
+```
+</CodeGroup>
+
+<ParamField path="userId" type="Long" required>
+  User ID to create profile for (must reference existing user with GUIDE role)
+</ParamField>
+
+<ParamField path="summary" type="string">
+  Professional summary
+</ParamField>
+
+<ParamField path="story" type="string">
+  Detailed background story
+</ParamField>
+
+<ParamField path="statusText" type="string">
+  Availability status
+</ParamField>
+
+<ParamField path="hourlyRate" type="BigDecimal">
+  Hourly service rate
+</ParamField>
+
+<ParamField path="currency" type="string">
+  Currency code
+</ParamField>
+
+<ParamField path="ratingAvg" type="BigDecimal">
+  Average rating (typically auto-calculated)
+</ParamField>
+
+<ParamField path="reviewsCount" type="Integer">
+  Reviews count (typically auto-calculated)
+</ParamField>
+
+<ParamField path="locationLabel" type="string">
+  Primary location
+</ParamField>
+
+<ParamField path="experienceLevel" type="string">
+  Experience level
+</ParamField>
+
+<ParamField path="style" type="string">
+  Tour guiding style
+</ParamField>
+
+<ParamField path="groupSize" type="string">
+  Group size preferences
+</ParamField>
+
+<ParamField path="tourIntensity" type="string">
+  Tour intensity level
+</ParamField>
+
+<ParamField path="transportOffered" type="string">
+  Transportation offered
+</ParamField>
+
+<ParamField path="photoStyle" type="string">
+  Photography services
+</ParamField>
+
+<ParamField path="additionalNotes" type="string">
+  Additional information
+</ParamField>
+
+<ParamField path="avatarUrl" type="string">
+  Avatar image URL
+</ParamField>
+
+<ParamField path="coverUrl" type="string">
+  Cover image URL
+</ParamField>
+
+<ParamField path="postText" type="string">
+  Featured post text
+</ParamField>
+
+<ParamField path="postImageUrl" type="string">
+  Featured post image URL
+</ParamField>
+
+<ParamField path="postCaption" type="string">
+  Featured post caption
+</ParamField>
+
+<ParamField path="postPublishedAt" type="datetime">
+  Post publication timestamp
+</ParamField>
+
+### Response
+
+```json
+{
+  "userId": 2,
+  "summary": "Expert cultural and historical guide with 10+ years experience",
+  "story": "Born and raised in Mexico City, I have been sharing the rich history and vibrant culture of my city with travelers from around the world for over a decade. My passion for archaeology and anthropology brings ancient civilizations to life.",
+  "statusText": "Available for bookings",
+  "hourlyRate": 45.00,
+  "currency": "USD",
+  "ratingAvg": 4.9,
+  "reviewsCount": 127,
+  "locationLabel": "Mexico City & surroundings",
+  "experienceLevel": "Expert",
+  "style": "Interactive & Educational",
+  "groupSize": "Up to 12 people",
+  "tourIntensity": "Moderate",
+  "transportOffered": "Private vehicle available",
+  "photoStyle": "Professional photos included",
+  "additionalNotes": "Specialized in pre-Hispanic history and archaeology",
+  "avatarUrl": "https://example.com/avatars/carlos.jpg",
+  "coverUrl": "https://example.com/covers/carlos-teotihuacan.jpg",
+  "postText": null,
+  "postImageUrl": null,
+  "postCaption": null,
+  "postPublishedAt": null,
+  "updatedAt": "2024-03-11T11:00:00Z"
+}
+```
+
+## Get All Guide Profiles
+
+<CodeGroup>
+```bash cURL
+curl -X GET http://localhost:8080/api/guide_profiles
+```
+</CodeGroup>
+
+Retrieves all guide profiles in the system.
+
+### Response
+
+```json
+[
+  {
+    "userId": 2,
+    "summary": "Expert cultural and historical guide with 10+ years experience",
+    "hourlyRate": 45.00,
+    "currency": "USD",
+    "ratingAvg": 4.9,
+    "reviewsCount": 127,
+    "locationLabel": "Mexico City & surroundings",
+    "experienceLevel": "Expert",
+    "avatarUrl": "https://example.com/avatars/carlos.jpg"
+  }
+]
+```
+
+## Get Guide Profile by ID
+
+<CodeGroup>
+```bash cURL
+curl -X GET http://localhost:8080/api/guide_profiles/2
+```
+</CodeGroup>
+
+Retrieves a specific guide profile by user ID.
+
+### Response
+
+```json
+{
+  "userId": 2,
+  "summary": "Expert cultural and historical guide with 10+ years experience",
+  "story": "Born and raised in Mexico City, I have been sharing the rich history and vibrant culture of my city with travelers from around the world for over a decade. My passion for archaeology and anthropology brings ancient civilizations to life.",
+  "statusText": "Available for bookings",
+  "hourlyRate": 45.00,
+  "currency": "USD",
+  "ratingAvg": 4.9,
+  "reviewsCount": 127,
+  "locationLabel": "Mexico City & surroundings",
+  "experienceLevel": "Expert",
+  "style": "Interactive & Educational",
+  "groupSize": "Up to 12 people",
+  "tourIntensity": "Moderate",
+  "transportOffered": "Private vehicle available",
+  "photoStyle": "Professional photos included",
+  "additionalNotes": "Specialized in pre-Hispanic history and archaeology",
+  "avatarUrl": "https://example.com/avatars/carlos.jpg",
+  "coverUrl": "https://example.com/covers/carlos-teotihuacan.jpg",
+  "postText": null,
+  "postImageUrl": null,
+  "postCaption": null,
+  "postPublishedAt": null,
+  "updatedAt": "2024-03-11T11:00:00Z"
+}
+```
+
+## Update Guide Profile
+
+<CodeGroup>
+```bash cURL
+curl -X PUT http://localhost:8080/api/guide_profiles/2 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 2,
+    "summary": "Award-winning cultural guide specializing in pre-Hispanic civilizations",
+    "hourlyRate": 50.00,
+    "statusText": "Booking fast - limited availability",
+    "ratingAvg": 4.95,
+    "reviewsCount": 142,
+    "updatedAt": "2024-03-15T16:30:00Z"
+  }'
+```
+</CodeGroup>
+
+Updates an existing guide profile.
+
+### Response
+
+```json
+{
+  "userId": 2,
+  "summary": "Award-winning cultural guide specializing in pre-Hispanic civilizations",
+  "story": "Born and raised in Mexico City, I have been sharing the rich history and vibrant culture of my city with travelers from around the world for over a decade. My passion for archaeology and anthropology brings ancient civilizations to life.",
+  "statusText": "Booking fast - limited availability",
+  "hourlyRate": 50.00,
+  "currency": "USD",
+  "ratingAvg": 4.95,
+  "reviewsCount": 142,
+  "locationLabel": "Mexico City & surroundings",
+  "experienceLevel": "Expert",
+  "style": "Interactive & Educational",
+  "groupSize": "Up to 12 people",
+  "tourIntensity": "Moderate",
+  "transportOffered": "Private vehicle available",
+  "photoStyle": "Professional photos included",
+  "additionalNotes": "Specialized in pre-Hispanic history and archaeology",
+  "avatarUrl": "https://example.com/avatars/carlos.jpg",
+  "coverUrl": "https://example.com/covers/carlos-teotihuacan.jpg",
+  "postText": null,
+  "postImageUrl": null,
+  "postCaption": null,
+  "postPublishedAt": null,
+  "updatedAt": "2024-03-15T16:30:00Z"
+}
+```
+
+## Delete Guide Profile
+
+<CodeGroup>
+```bash cURL
+curl -X DELETE http://localhost:8080/api/guide_profiles/2
+```
+</CodeGroup>
+
+Deletes a guide profile from the system.
+
+### Response
+
+```json
+{
+  "message": "Guide profile deleted successfully"
+}
+```
+
+## Related Endpoints
+
+- [Guide Certifications](/api/guide-certifications) - Manage guide certifications
+- [Guide Expertise Areas](/api/guide-expertise-areas) - Browse expertise categories
+- [Guide Locations](/api/guide-locations) - Manage service locations
+- [Guide Profile Expertise](/api/guide-profile-expertise) - Associate expertise with profile
+- [Guide Profile Languages](/api/guide-profile-languages) - Manage language associations

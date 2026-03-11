@@ -1,0 +1,275 @@
+---
+title: 'Newsletter'
+description: 'API endpoints for managing newsletter subscriptions'
+---
+
+## Newsletter Subscriptions
+
+Manage email newsletter subscriptions.
+
+### Create Newsletter Subscription
+
+<ParamField path="POST" type="endpoint">
+  `/api/newsletter_subscriptions`
+</ParamField>
+
+Creates a new newsletter subscription.
+
+**Request Body**
+
+<ParamField body="email" type="string" required>
+  Email address to subscribe
+</ParamField>
+
+<ParamField body="sourcePage" type="string">
+  Page URL where the subscription was initiated
+</ParamField>
+
+<ParamField body="isActive" type="boolean">
+  Whether the subscription is active. Default: `true`
+</ParamField>
+
+<ParamField body="createdAt" type="string">
+  Timestamp when subscription was created (ISO 8601 format)
+</ParamField>
+
+<ParamField body="unsubscribedAt" type="string">
+  Timestamp when user unsubscribed (ISO 8601 format). `null` if still subscribed
+</ParamField>
+
+**Response**
+
+<ResponseField name="subscriptionId" type="integer">
+  Unique identifier for the subscription
+</ResponseField>
+
+<ResponseField name="email" type="string">
+  Subscribed email address
+</ResponseField>
+
+<ResponseField name="sourcePage" type="string">
+  Source page URL
+</ResponseField>
+
+<ResponseField name="isActive" type="boolean">
+  Active status
+</ResponseField>
+
+<ResponseField name="createdAt" type="string">
+  Creation timestamp
+</ResponseField>
+
+<ResponseField name="unsubscribedAt" type="string">
+  Unsubscribe timestamp (null if active)
+</ResponseField>
+
+**Example Request**
+
+```bash
+curl -X POST http://localhost:8080/api/newsletter_subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "laura.garcia@example.com",
+    "sourcePage": "https://kinconecta.com/",
+    "isActive": true
+  }'
+```
+
+**Example Response**
+
+```json
+{
+  "subscriptionId": 5623,
+  "email": "laura.garcia@example.com",
+  "sourcePage": "https://kinconecta.com/",
+  "isActive": true,
+  "createdAt": "2026-03-11T15:45:12",
+  "unsubscribedAt": null
+}
+```
+
+---
+
+### Get All Newsletter Subscriptions
+
+<ParamField path="GET" type="endpoint">
+  `/api/newsletter_subscriptions`
+</ParamField>
+
+Retrieves all newsletter subscriptions.
+
+**Example Request**
+
+```bash
+curl http://localhost:8080/api/newsletter_subscriptions
+```
+
+**Example Response**
+
+```json
+[
+  {
+    "subscriptionId": 5623,
+    "email": "laura.garcia@example.com",
+    "sourcePage": "https://kinconecta.com/",
+    "isActive": true,
+    "createdAt": "2026-03-11T15:45:12",
+    "unsubscribedAt": null
+  },
+  {
+    "subscriptionId": 5622,
+    "email": "miguel.lopez@example.com",
+    "sourcePage": "https://kinconecta.com/tours",
+    "isActive": false,
+    "createdAt": "2026-03-10T12:30:00",
+    "unsubscribedAt": "2026-03-11T10:20:00"
+  }
+]
+```
+
+---
+
+### Get Newsletter Subscription by ID
+
+<ParamField path="GET" type="endpoint">
+  `/api/newsletter_subscriptions/{id}`
+</ParamField>
+
+Retrieves a specific newsletter subscription by ID.
+
+**Path Parameters**
+
+<ParamField path="id" type="integer" required>
+  The subscription ID
+</ParamField>
+
+**Example Request**
+
+```bash
+curl http://localhost:8080/api/newsletter_subscriptions/5623
+```
+
+**Example Response**
+
+```json
+{
+  "subscriptionId": 5623,
+  "email": "laura.garcia@example.com",
+  "sourcePage": "https://kinconecta.com/",
+  "isActive": true,
+  "createdAt": "2026-03-11T15:45:12",
+  "unsubscribedAt": null
+}
+```
+
+---
+
+### Update Newsletter Subscription
+
+<ParamField path="PUT" type="endpoint">
+  `/api/newsletter_subscriptions/{id}`
+</ParamField>
+
+Updates a newsletter subscription (typically to unsubscribe).
+
+**Path Parameters**
+
+<ParamField path="id" type="integer" required>
+  The subscription ID
+</ParamField>
+
+**Request Body**
+
+Same fields as Create Newsletter Subscription.
+
+**Example Request**
+
+```bash
+curl -X PUT http://localhost:8080/api/newsletter_subscriptions/5623 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "laura.garcia@example.com",
+    "sourcePage": "https://kinconecta.com/",
+    "isActive": false,
+    "createdAt": "2026-03-11T15:45:12",
+    "unsubscribedAt": "2026-03-11T16:30:00"
+  }'
+```
+
+**Example Response**
+
+```json
+{
+  "subscriptionId": 5623,
+  "email": "laura.garcia@example.com",
+  "sourcePage": "https://kinconecta.com/",
+  "isActive": false,
+  "createdAt": "2026-03-11T15:45:12",
+  "unsubscribedAt": "2026-03-11T16:30:00"
+}
+```
+
+---
+
+### Delete Newsletter Subscription
+
+<ParamField path="DELETE" type="endpoint">
+  `/api/newsletter_subscriptions/{id}`
+</ParamField>
+
+Permanently deletes a newsletter subscription.
+
+**Path Parameters**
+
+<ParamField path="id" type="integer" required>
+  The subscription ID
+</ParamField>
+
+**Example Request**
+
+```bash
+curl -X DELETE http://localhost:8080/api/newsletter_subscriptions/5623
+```
+
+## Common Use Cases
+
+### Subscribe to Newsletter
+
+To subscribe a user to the newsletter:
+
+```bash
+curl -X POST http://localhost:8080/api/newsletter_subscriptions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "newuser@example.com",
+    "isActive": true
+  }'
+```
+
+### Unsubscribe from Newsletter
+
+To unsubscribe a user (set `isActive` to `false` and record timestamp):
+
+```bash
+curl -X PUT http://localhost:8080/api/newsletter_subscriptions/5623 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "isActive": false,
+    "unsubscribedAt": "2026-03-11T16:30:00"
+  }'
+```
+
+### Re-subscribe
+
+To re-subscribe a previously unsubscribed user:
+
+```bash
+curl -X PUT http://localhost:8080/api/newsletter_subscriptions/5623 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "isActive": true,
+    "unsubscribedAt": null
+  }'
+```

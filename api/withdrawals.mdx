@@ -1,0 +1,201 @@
+---
+title: "Withdrawals"
+description: "Manage guide withdrawal requests and payouts"
+---
+
+## Create Withdrawal Request
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.kinconecta.com/api/withdrawal_requests \
+  -H "Content-Type: application/json" \
+  -d '{
+    "guideId": 789,
+    "requestedAmount": 500.00,
+    "status": "PENDING",
+    "bankReference": "BANK123456",
+    "notes": "Withdrawal to primary bank account",
+    "requestedAt": "2026-04-15T09:00:00"
+  }'
+```
+</CodeGroup>
+
+Create a new withdrawal request for a guide.
+
+### Request Body
+
+<ParamField body="guideId" type="integer" required>
+  ID of the guide requesting withdrawal
+</ParamField>
+
+<ParamField body="requestedAmount" type="decimal" required>
+  Amount to withdraw
+</ParamField>
+
+<ParamField body="status" type="enum" required>
+  Status of the withdrawal request
+  - `PENDING`: Request is pending review
+  - `APPROVED`: Request has been approved
+  - `REJECTED`: Request was rejected
+  - `PAID`: Withdrawal has been paid
+  - `CANCELLED`: Request was cancelled
+</ParamField>
+
+<ParamField body="bankReference" type="string">
+  Bank account reference or identifier
+</ParamField>
+
+<ParamField body="notes" type="string">
+  Additional notes about the withdrawal
+</ParamField>
+
+<ParamField body="requestedAt" type="datetime" required>
+  Timestamp when the withdrawal was requested
+</ParamField>
+
+<ParamField body="processedAt" type="datetime">
+  Timestamp when the withdrawal was processed
+</ParamField>
+
+<ParamField body="processedByUserId" type="integer">
+  ID of the admin user who processed the withdrawal
+</ParamField>
+
+### Response
+
+<ResponseField name="withdrawalId" type="integer">
+  Unique identifier for the withdrawal request
+</ResponseField>
+
+<ResponseField name="guideId" type="integer">
+  ID of the guide
+</ResponseField>
+
+<ResponseField name="requestedAmount" type="decimal">
+  Requested withdrawal amount
+</ResponseField>
+
+<ResponseField name="status" type="enum">
+  Withdrawal status
+</ResponseField>
+
+<ResponseField name="bankReference" type="string">
+  Bank account reference
+</ResponseField>
+
+<ResponseField name="notes" type="string">
+  Notes about the withdrawal
+</ResponseField>
+
+<ResponseField name="requestedAt" type="datetime">
+  When the withdrawal was requested
+</ResponseField>
+
+<ResponseField name="processedAt" type="datetime">
+  When the withdrawal was processed
+</ResponseField>
+
+<ResponseField name="processedByUserId" type="integer">
+  ID of the admin who processed it
+</ResponseField>
+
+## Get All Withdrawal Requests
+
+<CodeGroup>
+```bash cURL
+curl https://api.kinconecta.com/api/withdrawal_requests
+```
+</CodeGroup>
+
+Retrieve all withdrawal requests in the system.
+
+### Response
+
+Returns an array of withdrawal request objects.
+
+## Get Withdrawal Request by ID
+
+<CodeGroup>
+```bash cURL
+curl https://api.kinconecta.com/api/withdrawal_requests/123
+```
+</CodeGroup>
+
+Retrieve a specific withdrawal request by its ID.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The withdrawal request ID
+</ParamField>
+
+### Response
+
+Returns a single withdrawal request object.
+
+## Update Withdrawal Request
+
+<CodeGroup>
+```bash cURL
+curl -X PUT https://api.kinconecta.com/api/withdrawal_requests/123 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "status": "APPROVED",
+    "processedAt": "2026-04-15T10:30:00",
+    "processedByUserId": 1,
+    "notes": "Approved and scheduled for payment"
+  }'
+```
+</CodeGroup>
+
+Update an existing withdrawal request (typically used by admins to process requests).
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The withdrawal request ID
+</ParamField>
+
+### Request Body
+
+All fields from the create request are optional. Only provide the fields you want to update.
+
+<ParamField body="status" type="enum">
+  Updated status (PENDING, APPROVED, REJECTED, PAID, CANCELLED)
+</ParamField>
+
+<ParamField body="processedAt" type="datetime">
+  When the request was processed
+</ParamField>
+
+<ParamField body="processedByUserId" type="integer">
+  ID of the admin processing the request
+</ParamField>
+
+<ParamField body="notes" type="string">
+  Updated notes
+</ParamField>
+
+### Response
+
+Returns the updated withdrawal request object.
+
+## Delete Withdrawal Request
+
+<CodeGroup>
+```bash cURL
+curl -X DELETE https://api.kinconecta.com/api/withdrawal_requests/123
+```
+</CodeGroup>
+
+Delete a withdrawal request by its ID.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The withdrawal request ID
+</ParamField>
+
+### Response
+
+Returns 204 No Content on successful deletion.

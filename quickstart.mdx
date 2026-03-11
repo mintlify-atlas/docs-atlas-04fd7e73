@@ -1,80 +1,261 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quickstart
+description: Get started with Kin Conecta in minutes - create your account and complete your first action
 ---
 
-## Get started in three steps
+# Quickstart Guide
 
-Get your documentation site running locally and make your first customization.
-
-### Step 1: Set up your local environment
-
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 2: Deploy your changes
-
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
-
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
-
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 3: Go live
-
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
-
-## Next steps
-
-Now that you have your docs running, explore these key features:
-
-<CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
-</CardGroup>
+Get up and running with Kin Conecta quickly. This guide will help you create your account and complete your first meaningful action on the platform.
 
 <Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
+  Choose your path: Are you a **tourist** looking for authentic experiences, or a **local guide** ready to share your expertise?
 </Note>
+
+## For Tourists: Find Your First Guide
+
+Follow these steps to create a tourist account and discover your first guide.
+
+<Steps>
+  <Step title="Create Your Account">
+    Navigate to the registration page and select **Turista** (Tourist) as your role.
+    
+    Fill in your information:
+    ```html
+    - Full name (nombre completo)
+    - Date of birth (fecha de nacimiento)
+    - Country code (clave LADA)
+    - Phone number (teléfono)
+    - Email address (correo electrónico)
+    - Password (contraseña)
+    ```
+    
+    <Warning>
+      You must be 18 years or older to create an account.
+    </Warning>
+  </Step>
+  
+  <Step title="Complete Your Profile">
+    After registration, enhance your profile by adding:
+    - **Interests**: Select categories like gastronomy, adventure, history, or culture
+    - **Languages**: Add languages you speak
+    - **Profile photo**: Upload a profile picture
+    - **Travel preferences**: Set your travel style and preferences
+    
+    This helps the platform recommend the best guides for you.
+  </Step>
+  
+  <Step title="Explore Destinations">
+    Use the explore page to discover guides and tours:
+    
+    1. Navigate to the **Explorar** section from your dashboard
+    2. Use the search bar to find destinations or activities:
+    ```javascript
+    // Search by destination, guide name, or activity type
+    "Oaxaca gastronomy"
+    "Yucatan adventure"
+    "Mexico City history tour"
+    ```
+    3. Filter results by category:
+       - Gastronomía
+       - Aventura
+       - Historia
+       - Cultura
+  </Step>
+  
+  <Step title="Find and Contact a Guide">
+    Browse guide profiles and tour offerings:
+    
+    1. Click on any tour card to view details
+    2. Review the guide's:
+       - Experience and certifications
+       - Average rating and reviews
+       - Available tour plans
+       - Pricing and duration
+    3. Add guides to your favorites for later
+    4. Contact the guide directly through the platform
+    
+    <Note>
+      Look for the **Guía verificado** (Verified Guide) badge for added trust.
+    </Note>
+  </Step>
+  
+  <Step title="Book Your First Experience">
+    When you've found the perfect tour:
+    
+    1. Select your preferred date from the guide's calendar
+    2. Review the tour details and what's included
+    3. Submit your booking request
+    4. Wait for guide confirmation
+    5. Receive booking confirmation and trip details
+    
+    You can track all your bookings in the **Trips** section of your dashboard.
+  </Step>
+</Steps>
+
+---
+
+## For Guides: Create Your First Tour
+
+Follow these steps to set up your guide account and publish your first tour offering.
+
+<Steps>
+  <Step title="Register as a Guide">
+    Go to the registration page and select **Guía** (Guide) as your role.
+    
+    Complete the registration form with:
+    ```html
+    - Full name
+    - Date of birth
+    - Country code and phone number
+    - Email address
+    - Password
+    ```
+    
+    <Warning>
+      Guides must be at least 18 years old and may need to complete verification steps.
+    </Warning>
+  </Step>
+  
+  <Step title="Build Your Guide Profile">
+    Create a compelling profile that attracts tourists:
+    
+    **Essential Information:**
+    - Profile photo and cover image
+    - Bio and description of your expertise
+    - Location(s) where you offer services
+    - Languages you speak
+    
+    **Showcase Your Expertise:**
+    - Add certifications and credentials
+    - List your areas of expertise (history, gastronomy, adventure, etc.)
+    - Set your availability and preferences
+    - Add adaptation offerings (accessibility options)
+    
+    <CodeGroup>
+    ```json API Example - Guide Profile
+    {
+      "userId": 1,
+      "bio": "Experienced local guide specializing in cultural tours",
+      "yearsOfExperience": 5,
+      "hourlyRate": 500.00,
+      "maxGroupSize": 10,
+      "isVerified": true,
+      "verificationDate": "2026-03-01"
+    }
+    ```
+    
+    ```json API Example - Expertise Areas
+    {
+      "guideUserId": 1,
+      "expertiseAreaId": 2,
+      "proficiencyLevel": "EXPERT",
+      "yearsOfExperience": 5
+    }
+    ```
+    </CodeGroup>
+  </Step>
+  
+  <Step title="Create Your First Tour Plan">
+    Navigate to your guide dashboard and create a tour:
+    
+    **Tour Details:**
+    1. Give your tour a compelling title
+    2. Write a detailed description
+    3. Select tour category (gastronomy, adventure, culture, etc.)
+    4. Set duration and pricing
+    5. Define minimum and maximum group sizes
+    
+    **Add Destinations:**
+    - List the places you'll visit
+    - Add descriptions for each stop
+    - Set the order of destinations
+    
+    **Included Items:**
+    - Transportation
+    - Meals and beverages
+    - Entry tickets
+    - Equipment or materials
+    - Insurance coverage
+    
+    <CodeGroup>
+    ```json API Example - Create Tour
+    {
+      "guideUserId": 1,
+      "categoryId": 1,
+      "title": "Authentic Oaxaca Food Tour",
+      "description": "Experience traditional Oaxacan cuisine",
+      "duration": 4,
+      "durationUnit": "HOURS",
+      "basePrice": 850.00,
+      "currency": "MXN",
+      "maxGroupSize": 8,
+      "minGroupSize": 2,
+      "isActive": true
+    }
+    ```
+    
+    ```json API Example - Add Included Item
+    {
+      "tourId": 1,
+      "itemType": "MEAL",
+      "itemDescription": "Traditional Oaxacan mole tasting",
+      "isIncluded": true
+    }
+    ```
+    </CodeGroup>
+  </Step>
+  
+  <Step title="Set Your Availability">
+    Manage your calendar to show when you're available:
+    
+    1. Go to the **Calendar** section
+    2. Mark your available dates and times
+    3. Block dates when you're unavailable
+    4. Set recurring availability patterns
+    
+    Tourists can only book times when you're marked as available.
+  </Step>
+  
+  <Step title="Publish and Promote">
+    Final steps to go live:
+    
+    1. Review all your tour details
+    2. Ensure your profile is complete
+    3. Set your tour status to **Active**
+    4. Your tour is now visible to tourists!
+    
+    <Note>
+      Monitor your dashboard for booking requests and messages from potential clients.
+    </Note>
+  </Step>
+</Steps>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Installation Guide" icon="download" href="/installation">
+    Set up a local development environment
+  </Card>
+  
+  <Card title="API Reference" icon="code" href="/api/overview">
+    Explore the complete API documentation
+  </Card>
+  
+  <Card title="User Profiles" icon="user" href="/concepts/user-roles">
+    Learn about profile management and settings
+  </Card>
+  
+  <Card title="Tour Management" icon="map" href="/concepts/tours">
+    Deep dive into creating and managing tours
+  </Card>
+</CardGroup>
+
+## Need Help?
+
+If you encounter any issues during setup:
+- Check the FAQ section in your dashboard
+- Contact support through the help center
+- Review the detailed API documentation
+- Check the compatibility profiling guide for best matches

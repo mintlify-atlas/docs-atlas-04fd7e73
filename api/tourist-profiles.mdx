@@ -1,0 +1,360 @@
+---
+title: Tourist Profiles
+description: Manage tourist user profiles with preferences, interests, and travel styles
+---
+
+## Overview
+
+The Tourist Profiles API manages detailed profile information for tourist users. Each tourist profile is linked to a user account and contains travel preferences, interests, activity levels, and personalization settings.
+
+## Tourist Profile Object
+
+The Tourist Profile object extends user information with travel-specific data:
+
+<ResponseField name="userId" type="Long">
+  References the user account (primary key)
+</ResponseField>
+
+<ResponseField name="location" type="string">
+  Tourist's current location or home base
+</ResponseField>
+
+<ResponseField name="bio" type="string">
+  Personal biography or description
+</ResponseField>
+
+<ResponseField name="memberSince" type="date">
+  Date when the tourist joined the platform
+</ResponseField>
+
+<ResponseField name="badge" type="string">
+  Achievement badge or membership level
+</ResponseField>
+
+<ResponseField name="travelStyle" type="string">
+  Preferred travel style (e.g., adventurous, relaxed, cultural)
+</ResponseField>
+
+<ResponseField name="tripType" type="string">
+  Preferred trip types (e.g., solo, family, group)
+</ResponseField>
+
+<ResponseField name="paceAndCompany" type="string">
+  Preferred travel pace and company preferences
+</ResponseField>
+
+<ResponseField name="activityLevel" type="TouristProfileActivityLevel">
+  Activity level preference (enum value)
+</ResponseField>
+
+<ResponseField name="groupPreference" type="string">
+  Group size preferences
+</ResponseField>
+
+<ResponseField name="dietaryPreferences" type="string">
+  Dietary restrictions or preferences
+</ResponseField>
+
+<ResponseField name="planningLevel" type="TouristProfilePlanningLevel">
+  Planning style preference (enum value)
+</ResponseField>
+
+<ResponseField name="amenities" type="string">
+  Preferred amenities
+</ResponseField>
+
+<ResponseField name="transport" type="string">
+  Transportation preferences
+</ResponseField>
+
+<ResponseField name="photoPreference" type="string">
+  Photography preferences during tours
+</ResponseField>
+
+<ResponseField name="accessibility" type="string">
+  Accessibility requirements
+</ResponseField>
+
+<ResponseField name="additionalNotes" type="string">
+  Additional notes or special requests
+</ResponseField>
+
+<ResponseField name="avatarUrl" type="string">
+  URL to profile avatar image
+</ResponseField>
+
+<ResponseField name="coverUrl" type="string">
+  URL to profile cover image
+</ResponseField>
+
+<ResponseField name="updatedAt" type="datetime">
+  Last update timestamp
+</ResponseField>
+
+## Create Tourist Profile
+
+<CodeGroup>
+```bash cURL
+curl -X POST http://localhost:8080/api/tourist_profiles \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 1,
+    "location": "Mexico City, Mexico",
+    "bio": "Passionate traveler exploring cultural heritage sites and local cuisine.",
+    "memberSince": "2024-03-11",
+    "badge": "Explorer",
+    "travelStyle": "Cultural & Culinary",
+    "tripType": "Solo & Small Groups",
+    "paceAndCompany": "Moderate pace, enjoy meeting locals",
+    "activityLevel": "MODERATE",
+    "groupPreference": "Small groups (4-8 people)",
+    "dietaryPreferences": "Vegetarian",
+    "planningLevel": "FLEXIBLE",
+    "amenities": "WiFi, comfortable walking shoes recommended",
+    "transport": "Public transport & walking",
+    "photoPreference": "Love taking photos at scenic spots",
+    "accessibility": "None",
+    "additionalNotes": "Interested in off-the-beaten-path experiences",
+    "avatarUrl": "https://example.com/avatars/maria.jpg",
+    "coverUrl": "https://example.com/covers/maria-cover.jpg"
+  }'
+```
+</CodeGroup>
+
+<ParamField path="userId" type="Long" required>
+  User ID to create profile for (must reference existing user)
+</ParamField>
+
+<ParamField path="location" type="string">
+  Tourist's location
+</ParamField>
+
+<ParamField path="bio" type="string">
+  Personal biography
+</ParamField>
+
+<ParamField path="memberSince" type="date">
+  Membership start date
+</ParamField>
+
+<ParamField path="badge" type="string">
+  Achievement badge
+</ParamField>
+
+<ParamField path="travelStyle" type="string">
+  Travel style preferences
+</ParamField>
+
+<ParamField path="tripType" type="string">
+  Preferred trip types
+</ParamField>
+
+<ParamField path="paceAndCompany" type="string">
+  Pace and company preferences
+</ParamField>
+
+<ParamField path="activityLevel" type="TouristProfileActivityLevel">
+  Activity level
+</ParamField>
+
+<ParamField path="groupPreference" type="string">
+  Group size preference
+</ParamField>
+
+<ParamField path="dietaryPreferences" type="string">
+  Dietary preferences
+</ParamField>
+
+<ParamField path="planningLevel" type="TouristProfilePlanningLevel">
+  Planning level preference
+</ParamField>
+
+<ParamField path="amenities" type="string">
+  Preferred amenities
+</ParamField>
+
+<ParamField path="transport" type="string">
+  Transportation preferences
+</ParamField>
+
+<ParamField path="photoPreference" type="string">
+  Photography preferences
+</ParamField>
+
+<ParamField path="accessibility" type="string">
+  Accessibility requirements
+</ParamField>
+
+<ParamField path="additionalNotes" type="string">
+  Additional notes
+</ParamField>
+
+<ParamField path="avatarUrl" type="string">
+  Avatar image URL
+</ParamField>
+
+<ParamField path="coverUrl" type="string">
+  Cover image URL
+</ParamField>
+
+### Response
+
+```json
+{
+  "userId": 1,
+  "location": "Mexico City, Mexico",
+  "bio": "Passionate traveler exploring cultural heritage sites and local cuisine.",
+  "memberSince": "2024-03-11",
+  "badge": "Explorer",
+  "travelStyle": "Cultural & Culinary",
+  "tripType": "Solo & Small Groups",
+  "paceAndCompany": "Moderate pace, enjoy meeting locals",
+  "activityLevel": "MODERATE",
+  "groupPreference": "Small groups (4-8 people)",
+  "dietaryPreferences": "Vegetarian",
+  "planningLevel": "FLEXIBLE",
+  "amenities": "WiFi, comfortable walking shoes recommended",
+  "transport": "Public transport & walking",
+  "photoPreference": "Love taking photos at scenic spots",
+  "accessibility": "None",
+  "additionalNotes": "Interested in off-the-beaten-path experiences",
+  "avatarUrl": "https://example.com/avatars/maria.jpg",
+  "coverUrl": "https://example.com/covers/maria-cover.jpg",
+  "updatedAt": "2024-03-11T10:30:00Z"
+}
+```
+
+## Get All Tourist Profiles
+
+<CodeGroup>
+```bash cURL
+curl -X GET http://localhost:8080/api/tourist_profiles
+```
+</CodeGroup>
+
+Retrieves all tourist profiles in the system.
+
+### Response
+
+```json
+[
+  {
+    "userId": 1,
+    "location": "Mexico City, Mexico",
+    "bio": "Passionate traveler exploring cultural heritage sites and local cuisine.",
+    "memberSince": "2024-03-11",
+    "badge": "Explorer",
+    "travelStyle": "Cultural & Culinary",
+    "activityLevel": "MODERATE",
+    "avatarUrl": "https://example.com/avatars/maria.jpg"
+  }
+]
+```
+
+## Get Tourist Profile by ID
+
+<CodeGroup>
+```bash cURL
+curl -X GET http://localhost:8080/api/tourist_profiles/1
+```
+</CodeGroup>
+
+Retrieves a specific tourist profile by user ID.
+
+### Response
+
+```json
+{
+  "userId": 1,
+  "location": "Mexico City, Mexico",
+  "bio": "Passionate traveler exploring cultural heritage sites and local cuisine.",
+  "memberSince": "2024-03-11",
+  "badge": "Explorer",
+  "travelStyle": "Cultural & Culinary",
+  "tripType": "Solo & Small Groups",
+  "paceAndCompany": "Moderate pace, enjoy meeting locals",
+  "activityLevel": "MODERATE",
+  "groupPreference": "Small groups (4-8 people)",
+  "dietaryPreferences": "Vegetarian",
+  "planningLevel": "FLEXIBLE",
+  "amenities": "WiFi, comfortable walking shoes recommended",
+  "transport": "Public transport & walking",
+  "photoPreference": "Love taking photos at scenic spots",
+  "accessibility": "None",
+  "additionalNotes": "Interested in off-the-beaten-path experiences",
+  "avatarUrl": "https://example.com/avatars/maria.jpg",
+  "coverUrl": "https://example.com/covers/maria-cover.jpg",
+  "updatedAt": "2024-03-11T10:30:00Z"
+}
+```
+
+## Update Tourist Profile
+
+<CodeGroup>
+```bash cURL
+curl -X PUT http://localhost:8080/api/tourist_profiles/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 1,
+    "location": "Mexico City, Mexico",
+    "bio": "Experienced traveler with a passion for cultural immersion and authentic local cuisine.",
+    "travelStyle": "Cultural Immersion",
+    "activityLevel": "HIGH",
+    "badge": "Advanced Explorer",
+    "updatedAt": "2024-03-15T14:20:00Z"
+  }'
+```
+</CodeGroup>
+
+Updates an existing tourist profile.
+
+### Response
+
+```json
+{
+  "userId": 1,
+  "location": "Mexico City, Mexico",
+  "bio": "Experienced traveler with a passion for cultural immersion and authentic local cuisine.",
+  "memberSince": "2024-03-11",
+  "badge": "Advanced Explorer",
+  "travelStyle": "Cultural Immersion",
+  "tripType": "Solo & Small Groups",
+  "paceAndCompany": "Moderate pace, enjoy meeting locals",
+  "activityLevel": "HIGH",
+  "groupPreference": "Small groups (4-8 people)",
+  "dietaryPreferences": "Vegetarian",
+  "planningLevel": "FLEXIBLE",
+  "amenities": "WiFi, comfortable walking shoes recommended",
+  "transport": "Public transport & walking",
+  "photoPreference": "Love taking photos at scenic spots",
+  "accessibility": "None",
+  "additionalNotes": "Interested in off-the-beaten-path experiences",
+  "avatarUrl": "https://example.com/avatars/maria.jpg",
+  "coverUrl": "https://example.com/covers/maria-cover.jpg",
+  "updatedAt": "2024-03-15T14:20:00Z"
+}
+```
+
+## Delete Tourist Profile
+
+<CodeGroup>
+```bash cURL
+curl -X DELETE http://localhost:8080/api/tourist_profiles/1
+```
+</CodeGroup>
+
+Deletes a tourist profile from the system.
+
+### Response
+
+```json
+{
+  "message": "Tourist profile deleted successfully"
+}
+```
+
+## Related Endpoints
+
+- [Tourist Profile Interests](/api/tourist-profile-interests) - Manage interest associations
+- [Tourist Profile Languages](/api/tourist-profile-languages) - Manage language associations
+- [Interests](/api/interests) - Browse available interest categories

@@ -1,0 +1,344 @@
+---
+title: 'Authentication'
+description: 'Learn how to authenticate API requests and manage authentication sessions'
+---
+
+## Overview
+
+The Kin Conecta API uses session-based authentication to secure API endpoints. Authentication sessions are managed through the `/api/auth_sessions` endpoint.
+
+<Note>
+The current implementation uses token hash authentication. Ensure you follow secure practices when generating and storing tokens.
+</Note>
+
+## Authentication Flow
+
+The typical authentication flow involves:
+
+1. User logs in with credentials (handled by your authentication logic)
+2. Server creates an authentication session with a token
+3. Client includes the token in subsequent requests
+4. Server validates the token and session status
+5. Session expires or is revoked when user logs out
+
+## Auth Sessions
+
+Authentication sessions track active user sessions and contain important security metadata.
+
+### Session Model
+
+An authentication session includes:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `sessionId` | Long | Unique session identifier |
+| `userId` | Long | ID of the authenticated user |
+| `tokenHash` | String | Hashed authentication token |
+| `expiresAt` | DateTime | Token expiration timestamp |
+| `revokedAt` | DateTime | Revocation timestamp (null if active) |
+| `ip` | String | IP address of the client |
+| `userAgent` | String | Browser/client user agent |
+| `createdAt` | DateTime | Session creation timestamp |
+
+## Creating a Session
+
+Create a new authentication session when a user logs in.
+
+### Endpoint
+
+```
+POST /api/auth_sessions
+```
+
+### Request Body
+
+```json
+{
+  "userId": 1,
+  "tokenHash": "5f4dcc3b5aa765d61d8327deb882cf99",
+  "expiresAt": "2026-03-12T10:30:00",
+  "ip": "192.168.1.100",
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+  "createdAt": "2026-03-11T10:30:00"
+}
+```
+
+### Example Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "http://localhost:8080/api/auth_sessions" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 1,
+    "tokenHash": "5f4dcc3b5aa765d61d8327deb882cf99",
+    "expiresAt": "2026-03-12T10:30:00",
+    "ip": "192.168.1.100",
+    "userAgent": "Mozilla/5.0",
+    "createdAt": "2026-03-11T10:30:00"
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('http://localhost:8080/api/auth_sessions', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    userId: 1,
+    tokenHash: '5f4dcc3b5aa765d61d8327deb882cf99',
+    expiresAt: '2026-03-12T10:30:00',
+    ip: '192.168.1.100',
+    userAgent: navigator.userAgent,
+    createdAt: new Date().toISOString().slice(0, 19)
+  })
+});
+
+const session = await response.json();
+console.log(session);
+```
+
+```python Python
+import requests
+from datetime import datetime, timedelta
+
+payload = {
+    'userId': 1,
+    'tokenHash': '5f4dcc3b5aa765d61d8327deb882cf99',
+    'expiresAt': (datetime.now() + timedelta(days=1)).isoformat(),
+    'ip': '192.168.1.100',
+    'userAgent': 'Mozilla/5.0',
+    'createdAt': datetime.now().isoformat()
+}
+
+response = requests.post(
+    'http://localhost:8080/api/auth_sessions',
+    json=payload
+)
+
+session = response.json()
+print(session)
+```
+
+</CodeGroup>
+
+### Response
+
+```json
+{
+  "sessionId": 42,
+  "userId": 1,
+  "tokenHash": "5f4dcc3b5aa765d61d8327deb882cf99",
+  "expiresAt": "2026-03-12T10:30:00",
+  "revokedAt": null,
+  "ip": "192.168.1.100",
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+  "createdAt": "2026-03-11T10:30:00"
+}
+```
+
+<Warning>
+Always hash tokens before storing them. Never store plain-text tokens in the database.
+</Warning>
+
+## Retrieving Sessions
+
+You can retrieve authentication sessions to verify active sessions or audit login activity.
+
+### Get All Sessions
+
+```bash
+curl -X GET "http://localhost:8080/api/auth_sessions"
+```
+
+### Get Specific Session
+
+```bash
+curl -X GET "http://localhost:8080/api/auth_sessions/42"
+```
+
+### Response
+
+```json
+{
+  "sessionId": 42,
+  "userId": 1,
+  "tokenHash": "5f4dcc3b5aa765d61d8327deb882cf99",
+  "expiresAt": "2026-03-12T10:30:00",
+  "revokedAt": null,
+  "ip": "192.168.1.100",
+  "userAgent": "Mozilla/5.0",
+  "createdAt": "2026-03-11T10:30:00"
+}
+```
+
+## Updating a Session
+
+Update a session to revoke it or modify its expiration.
+
+### Endpoint
+
+```
+PUT /api/auth_sessions/{sessionId}
+```
+
+### Example: Revoking a Session
+
+<CodeGroup>
+
+```bash cURL
+curl -X PUT "http://localhost:8080/api/auth_sessions/42" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "revokedAt": "2026-03-11T15:30:00"
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('http://localhost:8080/api/auth_sessions/42', {
+  method: 'PUT',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    revokedAt: new Date().toISOString().slice(0, 19)
+  })
+});
+
+const updatedSession = await response.json();
+```
+
+</CodeGroup>
+
+## Deleting a Session
+
+Permanently delete a session from the database.
+
+### Endpoint
+
+```
+DELETE /api/auth_sessions/{sessionId}
+```
+
+### Example Request
+
+```bash
+curl -X DELETE "http://localhost:8080/api/auth_sessions/42"
+```
+
+### Response
+
+```text
+204 No Content
+```
+
+## Token Management Best Practices
+
+<AccordionGroup>
+  <Accordion title="Generate Secure Tokens">
+    Use cryptographically secure random number generators to create tokens. Minimum length should be 32 characters.
+    
+    ```javascript
+    // Example in Node.js
+    const crypto = require('crypto');
+    const token = crypto.randomBytes(32).toString('hex');
+    ```
+  </Accordion>
+
+  <Accordion title="Hash Tokens Before Storage">
+    Always hash tokens using a strong hashing algorithm (e.g., SHA-256) before storing in the database.
+    
+    ```javascript
+    const crypto = require('crypto');
+    const tokenHash = crypto
+      .createHash('sha256')
+      .update(token)
+      .digest('hex');
+    ```
+  </Accordion>
+
+  <Accordion title="Set Appropriate Expiration">
+    Sessions should expire after a reasonable time period:
+    - Short-lived: 1-2 hours for high-security operations
+    - Standard: 24 hours for regular user sessions
+    - Long-lived: 7-30 days for "remember me" functionality
+  </Accordion>
+
+  <Accordion title="Track Security Metadata">
+    Always capture and store:
+    - IP address for security auditing
+    - User agent for device tracking
+    - Creation timestamp for session history
+  </Accordion>
+
+  <Accordion title="Implement Session Validation">
+    Before processing requests, validate that:
+    - Session exists and matches the user
+    - Session has not expired (`expiresAt` > current time)
+    - Session has not been revoked (`revokedAt` is null)
+  </Accordion>
+
+  <Accordion title="Revoke Sessions on Logout">
+    When users log out, update the session with a `revokedAt` timestamp rather than deleting it immediately. This maintains an audit trail.
+  </Accordion>
+</AccordionGroup>
+
+## Session Validation Example
+
+Here's a typical session validation flow:
+
+```javascript
+async function validateSession(sessionId, providedToken) {
+  // 1. Fetch session from database
+  const session = await fetch(`http://localhost:8080/api/auth_sessions/${sessionId}`);
+  
+  if (!session) {
+    throw new Error('Session not found');
+  }
+  
+  // 2. Check if revoked
+  if (session.revokedAt) {
+    throw new Error('Session has been revoked');
+  }
+  
+  // 3. Check if expired
+  if (new Date(session.expiresAt) < new Date()) {
+    throw new Error('Session has expired');
+  }
+  
+  // 4. Verify token hash
+  const providedHash = hashToken(providedToken);
+  if (providedHash !== session.tokenHash) {
+    throw new Error('Invalid token');
+  }
+  
+  // 5. Session is valid
+  return session;
+}
+```
+
+<Note>
+This is a simplified example. In production, implement additional security measures such as rate limiting, token rotation, and IP validation.
+</Note>
+
+## Common Authentication Errors
+
+| Error | Status Code | Description | Solution |
+|-------|-------------|-------------|----------|
+| Invalid token | 401 | Token hash doesn't match | Verify token is correct and properly hashed |
+| Session expired | 401 | Current time > `expiresAt` | Require user to log in again |
+| Session revoked | 401 | `revokedAt` is not null | Require user to log in again |
+| Session not found | 404 | Session ID doesn't exist | Verify session ID or create new session |
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="User Management" icon="users" href="/api/users">
+    Learn about user creation and management
+  </Card>
+  <Card title="Error Handling" icon="triangle-exclamation" href="/api/errors">
+    Understand API error responses
+  </Card>
+</CardGroup>

@@ -1,0 +1,289 @@
+---
+title: Chat Messages
+description: Send, receive, and manage messages within chat threads
+---
+
+## Overview
+
+Chat messages enable communication between tourists and guides within chat threads. Messages support different types (text, system, file) and track delivery and read status.
+
+## Create Chat Message
+
+<CodeGroup>
+```bash cURL
+curl -X POST http://localhost:8080/api/chat_messages \
+  -H "Content-Type: application/json" \
+  -d '{
+    "threadId": 42,
+    "senderUserId": 10,
+    "body": "Hello! I have a question about the tour schedule.",
+    "messageType": "TEXT",
+    "sentAt": "2026-03-11T14:35:00",
+    "readAt": null
+  }'
+```
+</CodeGroup>
+
+Send a new message within a chat thread.
+
+### Request Body
+
+<ParamField body="threadId" type="integer" required>
+  The ID of the chat thread this message belongs to
+</ParamField>
+
+<ParamField body="senderUserId" type="integer" required>
+  The user ID of the message sender
+</ParamField>
+
+<ParamField body="body" type="string" required>
+  The content of the message
+</ParamField>
+
+<ParamField body="messageType" type="string" required>
+  Type of message. Valid values: `TEXT`, `SYSTEM`, `FILE`
+</ParamField>
+
+<ParamField body="sentAt" type="string">
+  Timestamp when the message was sent in ISO 8601 format (e.g., `2026-03-11T14:35:00`)
+</ParamField>
+
+<ParamField body="readAt" type="string">
+  Timestamp when the message was read in ISO 8601 format. Null if unread.
+</ParamField>
+
+### Response
+
+<ResponseField name="messageId" type="integer">
+  Unique identifier for the message
+</ResponseField>
+
+<ResponseField name="threadId" type="integer">
+  The chat thread ID this message belongs to
+</ResponseField>
+
+<ResponseField name="senderUserId" type="integer">
+  The sender's user ID
+</ResponseField>
+
+<ResponseField name="body" type="string">
+  The message content
+</ResponseField>
+
+<ResponseField name="messageType" type="string">
+  Message type (`TEXT`, `SYSTEM`, or `FILE`)
+</ResponseField>
+
+<ResponseField name="sentAt" type="string">
+  Timestamp when the message was sent
+</ResponseField>
+
+<ResponseField name="readAt" type="string">
+  Timestamp when the message was read (null if unread)
+</ResponseField>
+
+<ResponseExample>
+```json Response
+{
+  "messageId": 123,
+  "threadId": 42,
+  "senderUserId": 10,
+  "body": "Hello! I have a question about the tour schedule.",
+  "messageType": "TEXT",
+  "sentAt": "2026-03-11T14:35:00",
+  "readAt": null
+}
+```
+</ResponseExample>
+
+---
+
+## Get All Chat Messages
+
+<CodeGroup>
+```bash cURL
+curl -X GET http://localhost:8080/api/chat_messages \
+  -H "Content-Type: application/json"
+```
+</CodeGroup>
+
+Retrieve a list of all chat messages across all threads.
+
+### Response
+
+Returns an array of chat message objects.
+
+<ResponseExample>
+```json Response
+[
+  {
+    "messageId": 123,
+    "threadId": 42,
+    "senderUserId": 10,
+    "body": "Hello! I have a question about the tour schedule.",
+    "messageType": "TEXT",
+    "sentAt": "2026-03-11T14:35:00",
+    "readAt": "2026-03-11T14:40:00"
+  },
+  {
+    "messageId": 124,
+    "threadId": 42,
+    "senderUserId": 5,
+    "body": "Of course! The tour starts at 9 AM and lasts approximately 3 hours.",
+    "messageType": "TEXT",
+    "sentAt": "2026-03-11T14:42:00",
+    "readAt": null
+  }
+]
+```
+</ResponseExample>
+
+---
+
+## Get Chat Message by ID
+
+<CodeGroup>
+```bash cURL
+curl -X GET http://localhost:8080/api/chat_messages/123 \
+  -H "Content-Type: application/json"
+```
+</CodeGroup>
+
+Retrieve a specific chat message by its ID.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The unique identifier of the chat message
+</ParamField>
+
+### Response
+
+<ResponseExample>
+```json Response
+{
+  "messageId": 123,
+  "threadId": 42,
+  "senderUserId": 10,
+  "body": "Hello! I have a question about the tour schedule.",
+  "messageType": "TEXT",
+  "sentAt": "2026-03-11T14:35:00",
+  "readAt": "2026-03-11T14:40:00"
+}
+```
+</ResponseExample>
+
+---
+
+## Update Chat Message
+
+<CodeGroup>
+```bash cURL
+curl -X PUT http://localhost:8080/api/chat_messages/123 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "threadId": 42,
+    "senderUserId": 10,
+    "body": "Hello! I have a question about the tour schedule.",
+    "messageType": "TEXT",
+    "sentAt": "2026-03-11T14:35:00",
+    "readAt": "2026-03-11T14:40:00"
+  }'
+```
+</CodeGroup>
+
+Update an existing chat message. Commonly used to mark messages as read by updating the `readAt` timestamp.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The unique identifier of the chat message to update
+</ParamField>
+
+### Request Body
+
+<ParamField body="threadId" type="integer">
+  The ID of the chat thread this message belongs to
+</ParamField>
+
+<ParamField body="senderUserId" type="integer">
+  The user ID of the message sender
+</ParamField>
+
+<ParamField body="body" type="string">
+  The content of the message
+</ParamField>
+
+<ParamField body="messageType" type="string">
+  Type of message. Valid values: `TEXT`, `SYSTEM`, `FILE`
+</ParamField>
+
+<ParamField body="sentAt" type="string">
+  Timestamp when the message was sent in ISO 8601 format
+</ParamField>
+
+<ParamField body="readAt" type="string">
+  Timestamp when the message was read in ISO 8601 format. Set this to mark a message as read.
+</ParamField>
+
+### Response
+
+<ResponseExample>
+```json Response
+{
+  "messageId": 123,
+  "threadId": 42,
+  "senderUserId": 10,
+  "body": "Hello! I have a question about the tour schedule.",
+  "messageType": "TEXT",
+  "sentAt": "2026-03-11T14:35:00",
+  "readAt": "2026-03-11T14:40:00"
+}
+```
+</ResponseExample>
+
+---
+
+## Delete Chat Message
+
+<CodeGroup>
+```bash cURL
+curl -X DELETE http://localhost:8080/api/chat_messages/123 \
+  -H "Content-Type: application/json"
+```
+</CodeGroup>
+
+Permanently delete a chat message from a thread.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The unique identifier of the chat message to delete
+</ParamField>
+
+### Response
+
+Returns a success status code (typically 204 No Content) if the deletion was successful.
+
+---
+
+## Message Types
+
+Chat messages can have one of the following types:
+
+- **TEXT**: Standard text message sent by users
+- **SYSTEM**: Automated system message (e.g., "Booking confirmed", "Tour started")
+- **FILE**: Message containing a file attachment
+
+## Read Status
+
+Messages track their read status through the `readAt` field:
+
+- **Unread**: `readAt` is `null`
+- **Read**: `readAt` contains the timestamp when the message was read
+
+To mark a message as read, send a PUT request with the current timestamp in the `readAt` field.
+
+## Related Endpoints
+
+- [Chat Threads](/api/chat-threads) - Manage chat threads that contain messages

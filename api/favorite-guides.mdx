@@ -1,0 +1,222 @@
+---
+title: "Favorite Guides"
+description: "Manage tourist favorites for guides using composite keys"
+---
+
+## Overview
+
+The Favorite Guides API allows tourists to save their favorite guides for easy access and follow-up. This resource uses a composite key consisting of `touristId` and `guideId` to uniquely identify favorite relationships.
+
+## Composite Key Structure
+
+Favorite guide records are identified by a composite primary key:
+
+- **touristId**: The ID of the tourist user
+- **guideId**: The ID of the guide user
+
+This composite key ensures that each tourist-guide pair can only exist once in the system.
+
+## Endpoints
+
+### Create Favorite Guide
+
+<CodeGroup>
+
+```bash curl
+curl -X POST http://localhost:8080/api/favorite_guides \
+  -H "Content-Type: application/json" \
+  -d '{
+    "touristId": 123,
+    "guideId": 456
+  }'
+```
+
+</CodeGroup>
+
+Adds a guide to a tourist's favorites list.
+
+<ParamField body="touristId" type="Long" required>
+  The ID of the tourist user marking the guide as favorite
+</ParamField>
+
+<ParamField body="guideId" type="Long" required>
+  The ID of the guide user being marked as favorite
+</ParamField>
+
+<ParamField body="createdAt" type="datetime">
+  Optional timestamp. If not provided, the server will set it automatically.
+</ParamField>
+
+<ResponseField name="touristId" type="Long">
+  The ID of the tourist user
+</ResponseField>
+
+<ResponseField name="guideId" type="Long">
+  The ID of the guide user
+</ResponseField>
+
+<ResponseField name="createdAt" type="datetime">
+  Timestamp when the favorite was created
+</ResponseField>
+
+### Get All Favorite Guides
+
+<CodeGroup>
+
+```bash curl
+curl http://localhost:8080/api/favorite_guides
+```
+
+</CodeGroup>
+
+Retrieves a list of all favorite guide relationships.
+
+<ResponseField name="favorites" type="array">
+  Array of favorite guide objects
+</ResponseField>
+
+### Get Favorite Guide by Composite Key
+
+<CodeGroup>
+
+```bash curl
+curl http://localhost:8080/api/favorite_guides/123/456
+```
+
+</CodeGroup>
+
+Retrieves a specific favorite guide relationship using the composite key.
+
+<ParamField path="touristId" type="Long" required>
+  The ID of the tourist user
+</ParamField>
+
+<ParamField path="guideId" type="Long" required>
+  The ID of the guide user
+</ParamField>
+
+<ResponseField name="touristId" type="Long">
+  The ID of the tourist user
+</ResponseField>
+
+<ResponseField name="guideId" type="Long">
+  The ID of the guide user
+</ResponseField>
+
+<ResponseField name="createdAt" type="datetime">
+  Timestamp when the favorite was created
+</ResponseField>
+
+### Update Favorite Guide
+
+<CodeGroup>
+
+```bash curl
+curl -X PUT http://localhost:8080/api/favorite_guides/123/456 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "createdAt": "2024-03-15T10:30:00"
+  }'
+```
+
+</CodeGroup>
+
+Updates an existing favorite guide relationship. Typically used to update metadata like the creation timestamp.
+
+<ParamField path="touristId" type="Long" required>
+  The ID of the tourist user
+</ParamField>
+
+<ParamField path="guideId" type="Long" required>
+  The ID of the guide user
+</ParamField>
+
+<ParamField body="createdAt" type="datetime">
+  Updated timestamp for when the favorite was created
+</ParamField>
+
+<ResponseField name="touristId" type="Long">
+  The ID of the tourist user
+</ResponseField>
+
+<ResponseField name="guideId" type="Long">
+  The ID of the guide user
+</ResponseField>
+
+<ResponseField name="createdAt" type="datetime">
+  Updated timestamp
+</ResponseField>
+
+### Delete Favorite Guide
+
+<CodeGroup>
+
+```bash curl
+curl -X DELETE http://localhost:8080/api/favorite_guides/123/456
+```
+
+</CodeGroup>
+
+Removes a guide from a tourist's favorites list using the composite key.
+
+<ParamField path="touristId" type="Long" required>
+  The ID of the tourist user
+</ParamField>
+
+<ParamField path="guideId" type="Long" required>
+  The ID of the guide user
+</ParamField>
+
+<ResponseField name="status" type="204">
+  No content returned on successful deletion
+</ResponseField>
+
+## Usage Examples
+
+### Check if Guide is Favorited
+
+To check if a specific guide is in a tourist's favorites:
+
+<CodeGroup>
+
+```bash curl
+curl http://localhost:8080/api/favorite_guides/123/456
+```
+
+</CodeGroup>
+
+- If the relationship exists, you'll receive a 200 response with the favorite data
+- If it doesn't exist, you'll receive a 404 error
+
+### Get Tourist's Favorite Guides
+
+To retrieve all guides favorited by a specific tourist, filter the results from the get all endpoint:
+
+<CodeGroup>
+
+```bash curl
+curl http://localhost:8080/api/favorite_guides | jq '.[] | select(.touristId == 123)'
+```
+
+</CodeGroup>
+
+### Get Guides Who Favorited a User
+
+To see which tourists have favorited a specific guide:
+
+<CodeGroup>
+
+```bash curl
+curl http://localhost:8080/api/favorite_guides | jq '.[] | select(.guideId == 456)'
+```
+
+</CodeGroup>
+
+## Relationships
+
+The FavoriteGuide entity maintains relationships with:
+
+- **Tourist User**: References the user table via `touristId` → `user_id`
+- **Guide User**: References the user table via `guideId` → `user_id`
+
+Both IDs must reference valid users in the system.

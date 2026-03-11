@@ -1,0 +1,251 @@
+---
+title: 'API Overview'
+description: 'Introduction to the Kin Conecta REST API architecture, conventions, and usage'
+---
+
+## Introduction
+
+The Kin Conecta API is a RESTful service that powers the social network connecting tourists with local guides. The API follows standard REST conventions and uses JSON for all request and response payloads.
+
+## Base URL
+
+The API is accessible at the following base URL:
+
+```text
+http://localhost:8080
+```
+
+All endpoint paths are relative to this base URL. For example, to access users:
+
+```text
+http://localhost:8080/api/users
+```
+
+## API Architecture
+
+The Kin Conecta API is built using Spring Boot and follows a layered architecture:
+
+- **Controllers**: Handle HTTP requests and responses
+- **Services**: Contain business logic
+- **Repositories**: Manage data persistence
+- **DTOs**: Data Transfer Objects for request/response mapping
+- **Models**: Entity classes mapped to database tables
+
+### Technology Stack
+
+- Java 21
+- Spring Boot
+- MySQL 8+
+- JPA/Hibernate for ORM
+
+## HTTP Methods
+
+The API uses standard HTTP methods to perform CRUD operations:
+
+| Method | Purpose | Example |
+|--------|---------|----------|
+| `POST` | Create new resources | Create a new user |
+| `GET` | Retrieve resources | Get user details |
+| `PUT` | Update existing resources | Update user profile |
+| `DELETE` | Remove resources | Delete a booking |
+
+## Request Format
+
+### Content Type
+
+All requests that include a body must use the `application/json` content type:
+
+```bash
+Content-Type: application/json
+```
+
+### Request Structure
+
+Requests follow standard JSON formatting:
+
+<CodeGroup>
+
+```bash POST Request
+curl -X POST "http://localhost:8080/api/users" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "role": "TOURIST",
+    "fullName": "Ana Perez",
+    "dateOfBirth": "1998-04-17",
+    "email": "ana@example.com",
+    "passwordHash": "hash_demo",
+    "countryCode": "MX",
+    "phoneNumber": "5512345678",
+    "phoneE164": "+525512345678",
+    "preferredLanguageCode": "es",
+    "accountStatus": "ACTIVE"
+  }'
+```
+
+```bash GET Request
+curl -X GET "http://localhost:8080/api/users/1"
+```
+
+```bash PUT Request
+curl -X PUT "http://localhost:8080/api/users/1" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fullName": "Ana Perez Garcia",
+    "accountStatus": "ACTIVE"
+  }'
+```
+
+```bash DELETE Request
+curl -X DELETE "http://localhost:8080/api/users/1"
+```
+
+</CodeGroup>
+
+## Response Format
+
+### Success Responses
+
+Successful responses return JSON data with appropriate HTTP status codes:
+
+- `200 OK` - Successful GET, PUT requests
+- `201 Created` - Successful POST requests
+- `204 No Content` - Successful DELETE requests
+
+#### Example Success Response
+
+```json
+{
+  "userId": 1,
+  "role": "TOURIST",
+  "fullName": "Ana Perez",
+  "email": "ana@example.com",
+  "accountStatus": "ACTIVE",
+  "createdAt": "2026-03-11T10:30:00"
+}
+```
+
+### List Responses
+
+Endpoints that return multiple resources use JSON arrays:
+
+```json
+[
+  {
+    "userId": 1,
+    "fullName": "Ana Perez",
+    "role": "TOURIST"
+  },
+  {
+    "userId": 2,
+    "fullName": "Carlos Lopez",
+    "role": "GUIDE"
+  }
+]
+```
+
+<Note>
+For error responses, see the [Errors](/api/errors) page for complete documentation on error handling.
+</Note>
+
+## Common Patterns
+
+### Standard CRUD Endpoints
+
+Most resources follow the same URL pattern:
+
+| Operation | Method | Endpoint |
+|-----------|--------|----------|
+| Create | `POST` | `/api/{resource}` |
+| List All | `GET` | `/api/{resource}` |
+| Get One | `GET` | `/api/{resource}/{id}` |
+| Update | `PUT` | `/api/{resource}/{id}` |
+| Delete | `DELETE` | `/api/{resource}/{id}` |
+
+### Composite Keys
+
+Some resources use composite keys with multiple path parameters:
+
+```bash
+# Example: Tourist profile language
+GET /api/tourist_profile_languages/{userId}/{languageCode}
+PUT /api/tourist_profile_languages/{userId}/{languageCode}
+DELETE /api/tourist_profile_languages/{userId}/{languageCode}
+```
+
+### Date and Time Format
+
+The API uses ISO 8601 format for dates and timestamps:
+
+- **Date**: `YYYY-MM-DD` (e.g., `"2026-03-11"`)
+- **DateTime**: `YYYY-MM-DDTHH:mm:ss` (e.g., `"2026-03-11T10:30:00"`)
+
+### Enumerations
+
+Many fields use predefined enumeration values:
+
+```json
+{
+  "role": "TOURIST",        // or "GUIDE"
+  "accountStatus": "ACTIVE" // or "INACTIVE", "SUSPENDED"
+}
+```
+
+<Warning>
+Enum values are case-sensitive. Always use UPPERCASE for enum fields.
+</Warning>
+
+## API Resources
+
+The Kin Conecta API exposes 195 endpoints across 39 resource controllers, organized into the following categories:
+
+### User Management
+- Users
+- Auth Sessions
+- Languages
+
+### Profiles
+- Tourist Profiles
+- Guide Profiles
+- Certifications
+- Expertise Areas
+
+### Tours & Bookings
+- Tours
+- Destinations
+- Tour Categories
+- Trip Bookings
+- Trip Status History
+
+### Matching & Favorites
+- Compatibility Profiles
+- Favorite Guides
+- Favorite Tours
+
+### Communication
+- Chat Messages
+- Chat Threads
+- Notifications
+
+### Reviews & Feedback
+- Reviews
+- Review Replies
+
+### Support & Help
+- Support Tickets
+- FAQ Categories
+- FAQ Items
+
+### Contact
+- Contact Messages
+- Newsletter Subscriptions
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="lock" href="/api/authentication">
+    Learn how to authenticate API requests
+  </Card>
+  <Card title="Error Handling" icon="triangle-exclamation" href="/api/errors">
+    Understand error responses and codes
+  </Card>
+</CardGroup>

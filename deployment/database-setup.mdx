@@ -1,0 +1,213 @@
+---
+title: 'Database Setup'
+description: 'Set up MySQL database and run the Kin Conecta schema'
+icon: 'database'
+---
+
+## Overview
+
+Kin Conecta uses MySQL 8+ as its relational database. This guide covers the complete setup process, from installing MySQL to running the schema and seeding initial data.
+
+## Prerequisites
+
+- MySQL Server 8.0 or higher
+- MySQL Workbench (optional but recommended)
+- Access to MySQL root user or a user with schema creation privileges
+
+## Installation
+
+<Steps>
+  <Step title="Install MySQL Server">
+    Download and install MySQL Server from the [official MySQL website](https://dev.mysql.com/downloads/mysql/).
+
+    During installation, set a secure root password and note it down for later configuration.
+  </Step>
+
+  <Step title="Verify MySQL Installation">
+    Open a terminal or command prompt and verify MySQL is running:
+
+    ```bash
+    mysql --version
+    ```
+
+    You should see output similar to: `mysql  Ver 8.0.x`
+  </Step>
+
+  <Step title="Create the Database Schema">
+    Navigate to the backend directory and locate the SQL schema file:
+
+    ```bash
+    cd backendKC
+    ```
+
+    The main schema file is `kinConnect.sql`. This script will create the `KCv2` schema with all required tables.
+  </Step>
+
+  <Step title="Execute the Schema Script">
+    Run the SQL script using MySQL Workbench or command line:
+
+    <CodeGroup>
+    ```bash MySQL Workbench
+    # 1. Open MySQL Workbench
+    # 2. Connect to your MySQL server
+    # 3. File > Open SQL Script
+    # 4. Select kinConnect.sql
+    # 5. Execute the script (lightning bolt icon)
+    ```
+
+    ```bash Command Line
+    mysql -u root -p < kinConnect.sql
+    ```
+    </CodeGroup>
+
+    The script creates the schema `KCv2` with UTF-8MB4 Unicode collation.
+  </Step>
+
+  <Step title="Seed Initial Data (Optional)">
+    To populate the database with sample data for testing:
+
+    ```bash
+    mysql -u root -p KCv2 < kin_conecta_seed_data.sql
+    ```
+
+    This will insert test records for users, guides, tours, reviews, and more.
+  </Step>
+</Steps>
+
+## Database Schema
+
+The Kin Conecta database includes the following main tables:
+
+### Core Tables
+
+- **languages** - Supported languages (es, en, fr)
+- **users** - User accounts (TOURIST, GUIDE, ADMIN roles)
+- **tourist_profiles** - Tourist profile information
+- **guide_profiles** - Guide profile information and ratings
+- **interests** - Available interest categories
+- **guide_expertise_areas** - Guide specialization areas
+
+### Tour & Booking Tables
+
+- **tours** - Tour offerings created by guides
+- **tour_categories** - Tour categorization (Gastronómico, Aventura, Cultural)
+- **destinations** - Cities and locations
+- **trip_bookings** - Booking records linking tourists, guides, and tours
+- **trip_status_history** - Audit trail for booking status changes
+
+### Interaction Tables
+
+- **reviews** - Tourist reviews for completed trips
+- **review_replies** - Guide responses to reviews
+- **chat_threads** - Conversation threads between users
+- **chat_messages** - Individual chat messages
+- **favorite_guides** - Tourist saved guides
+- **favorite_tours** - Tourist saved tours
+
+### Support Tables
+
+- **support_tickets** - Customer support requests
+- **faq_categories** - FAQ organization
+- **faq_items** - Frequently asked questions
+- **contact_messages** - Contact form submissions
+
+### System Tables
+
+- **auth_sessions** - User authentication sessions
+- **notifications** - User notifications
+- **guide_calendar_events** - Guide availability and bookings
+- **compatibility_profiles** - Matching algorithm profiles
+- **compatibility_answers** - User answers for matching
+
+## Schema Configuration
+
+<Warning>
+  The SQL script creates a schema named `KCv2` by default. Ensure your `application.properties` file matches this schema name in the datasource URL.
+</Warning>
+
+### Default Schema Name
+
+The `kinConnect.sql` script contains:
+
+```sql
+CREATE SCHEMA IF NOT EXISTS `KCv2` 
+  DEFAULT CHARACTER SET utf8mb4 
+  COLLATE utf8mb4_unicode_ci;
+```
+
+### Schema Name Mismatch
+
+If you need to use a different schema name:
+
+1. Edit the SQL script and change `KCv2` to your preferred name
+2. Update the `spring.datasource.url` in `application.properties` to match
+3. Re-run the schema creation script
+
+## Verifying the Setup
+
+<Steps>
+  <Step title="Check Schema Creation">
+    Connect to MySQL and verify the schema exists:
+
+    ```sql
+    SHOW DATABASES LIKE 'KCv2';
+    ```
+  </Step>
+
+  <Step title="Verify Tables">
+    List all tables in the schema:
+
+    ```sql
+    USE KCv2;
+    SHOW TABLES;
+    ```
+
+    You should see approximately 35+ tables.
+  </Step>
+
+  <Step title="Check Seed Data">
+    If you ran the seed script, verify data exists:
+
+    ```sql
+    SELECT * FROM languages;
+    SELECT * FROM users LIMIT 5;
+    SELECT * FROM tours LIMIT 5;
+    ```
+  </Step>
+</Steps>
+
+## Common Issues
+
+### Unknown Database Error
+
+If you see `Unknown database 'KCv2'` when starting the application:
+
+1. Verify the schema exists in MySQL
+2. Check the schema name matches in both the SQL script and `application.properties`
+3. Ensure you executed the `kinConnect.sql` script successfully
+
+### Authentication Failed
+
+If MySQL connection fails with authentication errors:
+
+1. Verify your MySQL username and password in `application.properties`
+2. Test the connection manually:
+   ```bash
+   mysql -u root -p
+   ```
+3. Check if the MySQL user has sufficient privileges
+
+### Character Encoding Issues
+
+The schema uses `utf8mb4` encoding for full Unicode support (including emojis). If you encounter encoding issues:
+
+1. Verify MySQL server configuration supports utf8mb4
+2. Check the connection URL includes charset parameters
+3. Ensure client tools (MySQL Workbench) use UTF-8 encoding
+
+## Next Steps
+
+Once the database is set up, proceed to:
+
+- [Configuration](/deployment/configuration) - Configure database connection settings
+- [Backend Deployment](/deployment/backend-deployment) - Start the Spring Boot backend

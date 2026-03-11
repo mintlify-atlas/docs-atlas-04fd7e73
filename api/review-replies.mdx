@@ -1,0 +1,152 @@
+---
+title: "Review Replies"
+description: "Manage guide responses to tour reviews"
+---
+
+## Create Review Reply
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.kinconecta.com/api/review_replies \
+  -H "Content-Type: application/json" \
+  -d '{
+    "reviewId": 123,
+    "guideId": 789,
+    "message": "Thank you so much for your kind words! It was a pleasure showing you around."
+  }'
+```
+</CodeGroup>
+
+Create a new reply from a guide to a tourist's review.
+
+### Request Body
+
+<ParamField body="reviewId" type="integer" required>
+  ID of the review being replied to
+</ParamField>
+
+<ParamField body="guideId" type="integer" required>
+  ID of the guide posting the reply
+</ParamField>
+
+<ParamField body="message" type="string" required>
+  Reply message text
+</ParamField>
+
+### Response
+
+<ResponseField name="replyId" type="integer">
+  Unique identifier for the reply
+</ResponseField>
+
+<ResponseField name="reviewId" type="integer">
+  ID of the review
+</ResponseField>
+
+<ResponseField name="guideId" type="integer">
+  ID of the guide
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Reply message text
+</ResponseField>
+
+<ResponseField name="createdAt" type="datetime">
+  Timestamp when the reply was created
+</ResponseField>
+
+<ResponseField name="updatedAt" type="datetime">
+  Timestamp when the reply was last updated
+</ResponseField>
+
+## Get All Review Replies
+
+<CodeGroup>
+```bash cURL
+curl https://api.kinconecta.com/api/review_replies
+```
+</CodeGroup>
+
+Retrieve all review replies in the system.
+
+### Response
+
+Returns an array of review reply objects.
+
+## Get Review Reply by ID
+
+<CodeGroup>
+```bash cURL
+curl https://api.kinconecta.com/api/review_replies/456
+```
+</CodeGroup>
+
+Retrieve a specific review reply by its ID.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The reply ID
+</ParamField>
+
+### Response
+
+Returns a single review reply object.
+
+## Update Review Reply
+
+<CodeGroup>
+```bash cURL
+curl -X PUT https://api.kinconecta.com/api/review_replies/456 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "Updated reply: Thank you! Looking forward to hosting you again soon."
+  }'
+```
+</CodeGroup>
+
+Update an existing review reply.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The reply ID
+</ParamField>
+
+### Request Body
+
+<ParamField body="reviewId" type="integer">
+  Updated review ID (if changing the parent review)
+</ParamField>
+
+<ParamField body="guideId" type="integer">
+  Updated guide ID
+</ParamField>
+
+<ParamField body="message" type="string">
+  Updated message text
+</ParamField>
+
+### Response
+
+Returns the updated review reply object.
+
+## Delete Review Reply
+
+<CodeGroup>
+```bash cURL
+curl -X DELETE https://api.kinconecta.com/api/review_replies/456
+```
+</CodeGroup>
+
+Delete a review reply by its ID.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The reply ID
+</ParamField>
+
+### Response
+
+Returns 204 No Content on successful deletion.

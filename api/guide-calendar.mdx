@@ -1,0 +1,200 @@
+---
+title: "Guide Calendar"
+description: "Manage guide availability and calendar events"
+---
+
+## Create Calendar Event
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.kinconecta.com/api/guide_calendar_events \
+  -H "Content-Type: application/json" \
+  -d '{
+    "guideId": 789,
+    "eventType": "BOOKED",
+    "title": "City Walking Tour",
+    "startDatetime": "2026-04-15T10:00:00",
+    "endDatetime": "2026-04-15T14:00:00",
+    "organizerName": "John Doe",
+    "source": "TRIP",
+    "status": "ACTIVE"
+  }'
+```
+</CodeGroup>
+
+Create a new calendar event for a guide.
+
+### Request Body
+
+<ParamField body="guideId" type="integer" required>
+  ID of the guide
+</ParamField>
+
+<ParamField body="tripId" type="integer">
+  ID of the trip booking (if event is linked to a trip)
+</ParamField>
+
+<ParamField body="eventType" type="enum" required>
+  Type of calendar event
+  - `BOOKED`: Time is booked for a tour
+  - `BLOCKED`: Time is blocked and unavailable
+</ParamField>
+
+<ParamField body="title" type="string" required>
+  Event title
+</ParamField>
+
+<ParamField body="startDatetime" type="datetime" required>
+  Event start date and time
+</ParamField>
+
+<ParamField body="endDatetime" type="datetime" required>
+  Event end date and time
+</ParamField>
+
+<ParamField body="organizerName" type="string">
+  Name of the event organizer
+</ParamField>
+
+<ParamField body="source" type="enum" required>
+  Source of the calendar event
+  - `MANUAL`: Manually created by guide
+  - `GOOGLE`: Synced from Google Calendar
+  - `TRIP`: Automatically created from trip booking
+</ParamField>
+
+<ParamField body="status" type="enum" required>
+  Event status
+  - `ACTIVE`: Event is active
+  - `CANCELLED`: Event is cancelled
+</ParamField>
+
+### Response
+
+<ResponseField name="eventId" type="integer">
+  Unique identifier for the calendar event
+</ResponseField>
+
+<ResponseField name="guideId" type="integer">
+  ID of the guide
+</ResponseField>
+
+<ResponseField name="tripId" type="integer">
+  ID of the trip booking
+</ResponseField>
+
+<ResponseField name="eventType" type="enum">
+  Event type (BOOKED, BLOCKED)
+</ResponseField>
+
+<ResponseField name="title" type="string">
+  Event title
+</ResponseField>
+
+<ResponseField name="startDatetime" type="datetime">
+  Event start date and time
+</ResponseField>
+
+<ResponseField name="endDatetime" type="datetime">
+  Event end date and time
+</ResponseField>
+
+<ResponseField name="organizerName" type="string">
+  Name of the organizer
+</ResponseField>
+
+<ResponseField name="source" type="enum">
+  Event source (MANUAL, GOOGLE, TRIP)
+</ResponseField>
+
+<ResponseField name="status" type="enum">
+  Event status (ACTIVE, CANCELLED)
+</ResponseField>
+
+<ResponseField name="createdAt" type="datetime">
+  Timestamp when the event was created
+</ResponseField>
+
+## Get All Calendar Events
+
+<CodeGroup>
+```bash cURL
+curl https://api.kinconecta.com/api/guide_calendar_events
+```
+</CodeGroup>
+
+Retrieve all calendar events in the system.
+
+### Response
+
+Returns an array of calendar event objects.
+
+## Get Calendar Event by ID
+
+<CodeGroup>
+```bash cURL
+curl https://api.kinconecta.com/api/guide_calendar_events/123
+```
+</CodeGroup>
+
+Retrieve a specific calendar event by its ID.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The event ID
+</ParamField>
+
+### Response
+
+Returns a single calendar event object.
+
+## Update Calendar Event
+
+<CodeGroup>
+```bash cURL
+curl -X PUT https://api.kinconecta.com/api/guide_calendar_events/123 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Extended City Walking Tour",
+    "endDatetime": "2026-04-15T16:00:00",
+    "status": "ACTIVE"
+  }'
+```
+</CodeGroup>
+
+Update an existing calendar event.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The event ID
+</ParamField>
+
+### Request Body
+
+All fields from the create request are optional. Only provide the fields you want to update.
+
+### Response
+
+Returns the updated calendar event object.
+
+## Delete Calendar Event
+
+<CodeGroup>
+```bash cURL
+curl -X DELETE https://api.kinconecta.com/api/guide_calendar_events/123
+```
+</CodeGroup>
+
+Delete a calendar event by its ID.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The event ID
+</ParamField>
+
+### Response
+
+Returns 204 No Content on successful deletion.

@@ -1,0 +1,456 @@
+---
+title: 'Configuration'
+description: 'Configure application settings and environment variables'
+icon: 'gear'
+---
+
+## Overview
+
+This guide covers configuring the Kin Conecta backend application, focusing on database connections, JPA settings, and environment-specific configurations.
+
+## Configuration File Location
+
+The main configuration file is located at:
+
+```
+backendKC/src/main/resources/application.properties
+```
+
+This file contains all Spring Boot application settings, including database connection parameters.
+
+## Database Configuration
+
+### Connection Settings
+
+The backend requires MySQL database connection settings. Configure these properties in `application.properties`:
+
+```properties
+# Application name
+spring.application.name=KCv2
+
+# Database connection URL
+spring.datasource.url=jdbc:mysql://localhost:3306/KCv2?useSSL=false&allowPublicKeyRetrieval=true
+
+# Database credentials
+spring.datasource.username=root
+spring.datasource.password=YOUR_PASSWORD
+
+# MySQL JDBC driver
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+```
+
+<Warning>
+  **Never commit actual passwords to version control.** Use environment variables or a separate config file that's ignored by Git.
+</Warning>
+
+### Connection URL Parameters
+
+The datasource URL includes important parameters:
+
+- **localhost:3306** - MySQL host and port
+- **KCv2** - Database schema name (must match the schema created by `kinConnect.sql`)
+- **useSSL=false** - Disables SSL for local development
+- **allowPublicKeyRetrieval=true** - Allows the MySQL 8.0+ authentication method
+
+### Changing the Schema Name
+
+If you need to use a different schema name:
+
+1. Update the schema name in the SQL script (`kinConnect.sql`)
+2. Update the URL in `application.properties`:
+
+<CodeGroup>
+```properties Default (KCv2)
+spring.datasource.url=jdbc:mysql://localhost:3306/KCv2?useSSL=false&allowPublicKeyRetrieval=true
+```
+
+```properties Custom Schema
+spring.datasource.url=jdbc:mysql://localhost:3306/kin_conecta?useSSL=false&allowPublicKeyRetrieval=true
+```
+</CodeGroup>
+
+<Note>
+  The schema name in the INSTRUCTIONS.md file mentions both `kin_conecta` and `kinConecta`. The actual SQL script uses `KCv2`. Ensure consistency between your SQL script and configuration.
+</Note>
+
+## JPA and Hibernate Configuration
+
+### Schema Management
+
+Control how Hibernate handles the database schema:
+
+```properties
+spring.jpa.hibernate.ddl-auto=update
+```
+
+**Available options:**
+
+<CardGroup cols={2}>
+  <Card title="update" icon="rotate">
+    Updates schema automatically when entities change. **Recommended for development.**
+  </Card>
+  <Card title="validate" icon="check">
+    Validates schema matches entities but makes no changes. **Recommended for production.**
+  </Card>
+  <Card title="create" icon="plus">
+    Creates schema on startup, destroying existing data. **Use with caution.**
+  </Card>
+  <Card title="create-drop" icon="trash">
+    Creates schema on startup, drops on shutdown. **Only for testing.**
+  </Card>
+  <Card title="none" icon="ban">
+    No schema management. Use when schema is managed externally via SQL scripts.
+  </Card>
+</CardGroup>
+
+<Warning>
+  For production environments, use `validate` or `none` to prevent accidental schema changes. Manage schema changes through SQL migration scripts instead.
+</Warning>
+
+### SQL Logging
+
+Enable SQL query logging for debugging:
+
+```properties
+# Show SQL queries in console
+spring.jpa.show-sql=true
+
+# Format SQL for readability
+spring.jpa.properties.hibernate.format_sql=true
+```
+
+**Example output:**
+
+```sql
+Hibernate: 
+    select
+        u1_0.user_id,
+        u1_0.full_name,
+        u1_0.email,
+        u1_0.role 
+    from
+        users u1_0
+```
+
+<Info>
+  Disable SQL logging in production for better performance and cleaner logs.
+</Info>
+
+## Environment-Specific Configurations
+
+Spring Boot supports multiple configuration files for different environments.
+
+### Creating Environment Profiles
+
+<Steps>
+  <Step title="Create Profile-Specific Files">
+    Create separate properties files for each environment:
+
+    - `application-dev.properties` - Development
+    - `application-staging.properties` - Staging
+    - `application-prod.properties` - Production
+  </Step>
+
+  <Step title="Configure Each Profile">
+    <CodeGroup>
+    ```properties application-dev.properties
+    # Development database
+    spring.datasource.url=jdbc:mysql://localhost:3306/KCv2?useSSL=false&allowPublicKeyRetrieval=true
+    spring.datasource.username=root
+    spring.datasource.password=devpassword
+
+    # Enable SQL logging
+    spring.jpa.show-sql=true
+    spring.jpa.properties.hibernate.format_sql=true
+
+    # Auto-update schema
+    spring.jpa.hibernate.ddl-auto=update
+    ```
+
+    ```properties application-prod.properties
+    # Production database
+    spring.datasource.url=jdbc:mysql://prod-db-server:3306/kin_conecta_prod?useSSL=true
+    spring.datasource.username=${DB_USERNAME}
+    spring.datasource.password=${DB_PASSWORD}
+
+    # Disable SQL logging
+    spring.jpa.show-sql=false
+
+    # Only validate schema
+    spring.jpa.hibernate.ddl-auto=validate
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="Activate a Profile">
+    Specify the active profile when running the application:
+
+    <CodeGroup>
+    ```bash Command Line
+    # Development
+    ./gradlew bootRun --args='--spring.profiles.active=dev'
+
+    # Production
+    ./gradlew bootRun --args='--spring.profiles.active=prod'
+    ```
+
+    ```bash JAR Execution
+    java -jar app.jar --spring.profiles.active=prod
+    ```
+
+    ```properties application.properties
+    # Set default profile
+    spring.profiles.active=dev
+    ```
+    </CodeGroup>
+  </Step>
+</Steps>
+
+## Environment Variables
+
+Use environment variables for sensitive configuration:
+
+### Setting Environment Variables
+
+<CodeGroup>
+```bash Linux/Mac
+export DB_USERNAME=root
+export DB_PASSWORD=secret123
+export DB_HOST=localhost
+export DB_PORT=3306
+export DB_NAME=KCv2
+```
+
+```powershell Windows PowerShell
+$env:DB_USERNAME="root"
+$env:DB_PASSWORD="secret123"
+$env:DB_HOST="localhost"
+$env:DB_PORT="3306"
+$env:DB_NAME="KCv2"
+```
+
+```cmd Windows CMD
+set DB_USERNAME=root
+set DB_PASSWORD=secret123
+set DB_HOST=localhost
+set DB_PORT=3306
+set DB_NAME=KCv2
+```
+</CodeGroup>
+
+### Using Environment Variables
+
+Reference environment variables in `application.properties`:
+
+```properties
+spring.datasource.url=jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:KCv2}?useSSL=false&allowPublicKeyRetrieval=true
+spring.datasource.username=${DB_USERNAME:root}
+spring.datasource.password=${DB_PASSWORD}
+```
+
+The syntax `${VAR_NAME:default}` provides a default value if the environment variable is not set.
+
+## Server Configuration
+
+### Port Configuration
+
+Change the server port if 8080 is already in use:
+
+```properties
+# Change server port
+server.port=8081
+```
+
+### Context Path
+
+Add a context path to the application:
+
+```properties
+# Access at http://localhost:8080/kinconecta
+server.servlet.context-path=/kinconecta
+```
+
+### Session Configuration
+
+```properties
+# Session timeout (30 minutes)
+server.servlet.session.timeout=30m
+
+# Session cookie name
+server.servlet.session.cookie.name=KINCONECTA_SESSION
+```
+
+## Security Configuration
+
+The application includes Spring Security. Configure authentication settings:
+
+```properties
+# Security settings (add to application.properties)
+spring.security.user.name=admin
+spring.security.user.password=admin123
+```
+
+<Warning>
+  These basic authentication settings are for development only. Implement proper authentication and authorization for production.
+</Warning>
+
+## Recommended Configurations
+
+### Development Environment
+
+Optimal settings for local development:
+
+```properties
+spring.application.name=KCv2
+
+# Database
+spring.datasource.url=jdbc:mysql://localhost:3306/KCv2?useSSL=false&allowPublicKeyRetrieval=true
+spring.datasource.username=root
+spring.datasource.password=YOUR_DEV_PASSWORD
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# JPA/Hibernate
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+# Server
+server.port=8080
+```
+
+### Production Environment
+
+Secure settings for production deployment:
+
+```properties
+spring.application.name=KCv2
+
+# Database (use environment variables)
+spring.datasource.url=jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=true&requireSSL=true
+spring.datasource.username=${DB_USERNAME}
+spring.datasource.password=${DB_PASSWORD}
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# JPA/Hibernate
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.format_sql=false
+
+# Connection pool
+spring.datasource.hikari.maximum-pool-size=10
+spring.datasource.hikari.minimum-idle=5
+spring.datasource.hikari.connection-timeout=30000
+
+# Server
+server.port=8080
+```
+
+## Connection Pool Settings
+
+Spring Boot uses HikariCP as the default connection pool. Configure it for optimal performance:
+
+```properties
+# Maximum number of connections
+spring.datasource.hikari.maximum-pool-size=10
+
+# Minimum idle connections
+spring.datasource.hikari.minimum-idle=5
+
+# Connection timeout (milliseconds)
+spring.datasource.hikari.connection-timeout=30000
+
+# Maximum lifetime of a connection (milliseconds)
+spring.datasource.hikari.max-lifetime=1800000
+
+# Idle timeout (milliseconds)
+spring.datasource.hikari.idle-timeout=600000
+```
+
+## Troubleshooting Configuration Issues
+
+### Schema Name Mismatch
+
+**Problem:** `Unknown database 'KCv2'`
+
+**Solution:**
+1. Verify the schema exists in MySQL:
+   ```sql
+   SHOW DATABASES LIKE 'KCv2';
+   ```
+2. Ensure the schema name in the SQL script matches `application.properties`
+3. Create the schema if it doesn't exist
+
+### Authentication Failures
+
+**Problem:** `Access denied for user 'root'@'localhost'`
+
+**Solution:**
+1. Verify MySQL credentials are correct
+2. Test connection manually:
+   ```bash
+   mysql -u root -p
+   ```
+3. Ensure the MySQL user has proper permissions:
+   ```sql
+   GRANT ALL PRIVILEGES ON KCv2.* TO 'root'@'localhost';
+   FLUSH PRIVILEGES;
+   ```
+
+### SSL Connection Errors
+
+**Problem:** SSL connection errors with MySQL
+
+**Solution:**
+1. For local development, disable SSL:
+   ```properties
+   spring.datasource.url=jdbc:mysql://localhost:3306/KCv2?useSSL=false&allowPublicKeyRetrieval=true
+   ```
+2. For production, configure proper SSL certificates
+
+### Connection Pool Exhaustion
+
+**Problem:** `Connection pool exhausted` errors under load
+
+**Solution:**
+Increase pool size and adjust timeouts:
+```properties
+spring.datasource.hikari.maximum-pool-size=20
+spring.datasource.hikari.connection-timeout=60000
+```
+
+## Validation
+
+After configuration, verify everything works:
+
+<Steps>
+  <Step title="Start the Application">
+    ```bash
+    ./gradlew bootRun
+    ```
+  </Step>
+
+  <Step title="Check Logs">
+    Look for successful startup messages:
+    ```
+    Tomcat started on port(s): 8080 (http)
+    Started KCv2Application in X.XXX seconds
+    ```
+  </Step>
+
+  <Step title="Test Database Connection">
+    Watch for SQL queries in the logs if `show-sql=true`
+  </Step>
+
+  <Step title="Test an Endpoint">
+    ```bash
+    curl http://localhost:8080/api/users
+    ```
+  </Step>
+</Steps>
+
+## Next Steps
+
+- [Database Setup](/deployment/database-setup) - Create and populate the database
+- [Backend Deployment](/deployment/backend-deployment) - Run the Spring Boot application
+- [Frontend Deployment](/deployment/frontend-deployment) - Serve the web interface
+- Review security best practices for production deployment

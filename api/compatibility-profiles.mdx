@@ -1,0 +1,365 @@
+---
+title: "Compatibility Profiles"
+description: "Manage compatibility profiles and answers for matching travelers with guides"
+---
+
+## Overview
+
+The Compatibility Profiles API allows you to manage compatibility profiles for users (travelers and guides) and their compatibility questionnaire answers. This system supports the matching algorithm that connects travelers with suitable guides based on their preferences and characteristics.
+
+## Compatibility Profile Endpoints
+
+### Create Compatibility Profile
+
+<CodeGroup>
+
+```bash curl
+curl -X POST http://localhost:8080/api/compatibility_profiles \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 123,
+    "role": "TRAVELER",
+    "name": "John Doe",
+    "imgUrl": "https://example.com/profile.jpg",
+    "description": "Adventure-seeking traveler",
+    "email": "john@example.com",
+    "dateOfBirth": "1990-05-15",
+    "phoneCountryCode": "+1",
+    "phoneNumber": "5551234567",
+    "phoneE164": "+15551234567"
+  }'
+```
+
+</CodeGroup>
+
+Creates a new compatibility profile for a user.
+
+<ParamField body="userId" type="Long" required>
+  The ID of the user this profile belongs to
+</ParamField>
+
+<ParamField body="role" type="enum" required>
+  The role of the user. Possible values:
+  - `TRAVELER` - For tourist/traveler profiles
+  - `GUIDE` - For guide profiles
+</ParamField>
+
+<ParamField body="name" type="string">
+  Full name of the user
+</ParamField>
+
+<ParamField body="imgUrl" type="string">
+  URL to the user's profile image
+</ParamField>
+
+<ParamField body="description" type="string">
+  Brief description or bio of the user
+</ParamField>
+
+<ParamField body="email" type="string">
+  User's email address
+</ParamField>
+
+<ParamField body="dateOfBirth" type="date">
+  User's date of birth in format YYYY-MM-DD
+</ParamField>
+
+<ParamField body="phoneCountryCode" type="string">
+  Country code for phone number (e.g., "+1")
+</ParamField>
+
+<ParamField body="phoneNumber" type="string">
+  Phone number without country code
+</ParamField>
+
+<ParamField body="phoneE164" type="string">
+  Phone number in E.164 format
+</ParamField>
+
+<ResponseField name="compatibilityProfileId" type="Long">
+  Unique identifier for the compatibility profile
+</ResponseField>
+
+<ResponseField name="userId" type="Long">
+  The ID of the user this profile belongs to
+</ResponseField>
+
+<ResponseField name="role" type="enum">
+  The role of the user (TRAVELER or GUIDE)
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Full name of the user
+</ResponseField>
+
+<ResponseField name="imgUrl" type="string">
+  URL to the user's profile image
+</ResponseField>
+
+<ResponseField name="description" type="string">
+  Brief description or bio of the user
+</ResponseField>
+
+<ResponseField name="email" type="string">
+  User's email address
+</ResponseField>
+
+<ResponseField name="dateOfBirth" type="date">
+  User's date of birth
+</ResponseField>
+
+<ResponseField name="phoneCountryCode" type="string">
+  Country code for phone number
+</ResponseField>
+
+<ResponseField name="phoneNumber" type="string">
+  Phone number without country code
+</ResponseField>
+
+<ResponseField name="phoneE164" type="string">
+  Phone number in E.164 format
+</ResponseField>
+
+<ResponseField name="createdAt" type="datetime">
+  Timestamp when the profile was created
+</ResponseField>
+
+<ResponseField name="updatedAt" type="datetime">
+  Timestamp when the profile was last updated
+</ResponseField>
+
+### Get All Compatibility Profiles
+
+<CodeGroup>
+
+```bash curl
+curl http://localhost:8080/api/compatibility_profiles
+```
+
+</CodeGroup>
+
+Retrieves a list of all compatibility profiles.
+
+<ResponseField name="profiles" type="array">
+  Array of compatibility profile objects
+</ResponseField>
+
+### Get Compatibility Profile by ID
+
+<CodeGroup>
+
+```bash curl
+curl http://localhost:8080/api/compatibility_profiles/1
+```
+
+</CodeGroup>
+
+Retrieves a specific compatibility profile by its ID.
+
+<ParamField path="id" type="Long" required>
+  The ID of the compatibility profile to retrieve
+</ParamField>
+
+### Update Compatibility Profile
+
+<CodeGroup>
+
+```bash curl
+curl -X PUT http://localhost:8080/api/compatibility_profiles/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 123,
+    "role": "TRAVELER",
+    "name": "John Doe Updated",
+    "imgUrl": "https://example.com/profile-new.jpg",
+    "description": "Experienced adventure traveler",
+    "email": "john.updated@example.com",
+    "dateOfBirth": "1990-05-15",
+    "phoneCountryCode": "+1",
+    "phoneNumber": "5559876543",
+    "phoneE164": "+15559876543"
+  }'
+```
+
+</CodeGroup>
+
+Updates an existing compatibility profile.
+
+<ParamField path="id" type="Long" required>
+  The ID of the compatibility profile to update
+</ParamField>
+
+### Delete Compatibility Profile
+
+<CodeGroup>
+
+```bash curl
+curl -X DELETE http://localhost:8080/api/compatibility_profiles/1
+```
+
+</CodeGroup>
+
+Deletes a compatibility profile by ID.
+
+<ParamField path="id" type="Long" required>
+  The ID of the compatibility profile to delete
+</ParamField>
+
+<ResponseField name="status" type="204">
+  No content returned on successful deletion
+</ResponseField>
+
+## Compatibility Answer Endpoints
+
+### Create Compatibility Answer
+
+<CodeGroup>
+
+```bash curl
+curl -X POST http://localhost:8080/api/compatibility_answers \
+  -H "Content-Type: application/json" \
+  -d '{
+    "compatibilityProfileId": 1,
+    "questionKey": "travel_style",
+    "valueText": "adventure",
+    "valueNumber": null,
+    "valueJson": null
+  }'
+```
+
+</CodeGroup>
+
+Creates a new compatibility answer for a profile. Answers store user responses to compatibility questionnaires used in the matching algorithm.
+
+<ParamField body="compatibilityProfileId" type="Long" required>
+  The ID of the compatibility profile this answer belongs to
+</ParamField>
+
+<ParamField body="questionKey" type="string" required>
+  Unique key identifying the question being answered
+</ParamField>
+
+<ParamField body="valueText" type="string">
+  Text value for the answer (for text-based questions)
+</ParamField>
+
+<ParamField body="valueNumber" type="decimal">
+  Numeric value for the answer (for numeric/rating questions)
+</ParamField>
+
+<ParamField body="valueJson" type="string">
+  JSON string for complex/multi-value answers
+</ParamField>
+
+<ResponseField name="answerId" type="Long">
+  Unique identifier for the answer
+</ResponseField>
+
+<ResponseField name="compatibilityProfileId" type="Long">
+  The ID of the compatibility profile
+</ResponseField>
+
+<ResponseField name="questionKey" type="string">
+  Unique key identifying the question
+</ResponseField>
+
+<ResponseField name="valueText" type="string">
+  Text value for the answer
+</ResponseField>
+
+<ResponseField name="valueNumber" type="decimal">
+  Numeric value for the answer
+</ResponseField>
+
+<ResponseField name="valueJson" type="string">
+  JSON string for complex answers
+</ResponseField>
+
+<ResponseField name="createdAt" type="datetime">
+  Timestamp when the answer was created
+</ResponseField>
+
+### Get All Compatibility Answers
+
+<CodeGroup>
+
+```bash curl
+curl http://localhost:8080/api/compatibility_answers
+```
+
+</CodeGroup>
+
+Retrieves a list of all compatibility answers.
+
+<ResponseField name="answers" type="array">
+  Array of compatibility answer objects
+</ResponseField>
+
+### Get Compatibility Answer by ID
+
+<CodeGroup>
+
+```bash curl
+curl http://localhost:8080/api/compatibility_answers/1
+```
+
+</CodeGroup>
+
+Retrieves a specific compatibility answer by its ID.
+
+<ParamField path="id" type="Long" required>
+  The ID of the compatibility answer to retrieve
+</ParamField>
+
+### Update Compatibility Answer
+
+<CodeGroup>
+
+```bash curl
+curl -X PUT http://localhost:8080/api/compatibility_answers/1 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "compatibilityProfileId": 1,
+    "questionKey": "travel_style",
+    "valueText": "luxury_adventure",
+    "valueNumber": 8.5,
+    "valueJson": "{\"preferences\": [\"hiking\", \"cultural\"]}"
+  }'
+```
+
+</CodeGroup>
+
+Updates an existing compatibility answer.
+
+<ParamField path="id" type="Long" required>
+  The ID of the compatibility answer to update
+</ParamField>
+
+### Delete Compatibility Answer
+
+<CodeGroup>
+
+```bash curl
+curl -X DELETE http://localhost:8080/api/compatibility_answers/1
+```
+
+</CodeGroup>
+
+Deletes a compatibility answer by ID.
+
+<ParamField path="id" type="Long" required>
+  The ID of the compatibility answer to delete
+</ParamField>
+
+<ResponseField name="status" type="204">
+  No content returned on successful deletion
+</ResponseField>
+
+## Matching Logic
+
+The compatibility system uses profiles and answers to:
+
+1. **Profile Matching**: Match travelers with guides based on role-specific attributes
+2. **Preference Alignment**: Compare compatibility answers to find best matches
+3. **Multi-format Responses**: Support text, numeric, and JSON answer formats for flexible questionnaires
+4. **Historical Tracking**: Maintain creation timestamps for analytics and improvements

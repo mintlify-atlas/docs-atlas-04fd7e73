@@ -1,0 +1,435 @@
+---
+title: 'Tours'
+description: 'Manage tour experiences offered by guides'
+---
+
+## Create Tour
+
+<api method="POST" path="/api/tours">
+Creates a new tour experience.
+
+### Request Body
+
+<ParamField body="guideId" type="Long" required>
+  ID of the guide creating the tour
+</ParamField>
+
+<ParamField body="categoryId" type="Integer" required>
+  ID of the tour category (type of experience)
+</ParamField>
+
+<ParamField body="title" type="String" required>
+  Title of the tour
+</ParamField>
+
+<ParamField body="description" type="String" required>
+  Detailed description of the tour experience
+</ParamField>
+
+<ParamField body="price" type="BigDecimal" required>
+  Price of the tour
+</ParamField>
+
+<ParamField body="currency" type="String" required>
+  Currency code (e.g., "MXN", "USD")
+</ParamField>
+
+<ParamField body="durationHours" type="BigDecimal" required>
+  Duration of the tour in hours
+</ParamField>
+
+<ParamField body="maxGroupSize" type="Integer" required>
+  Maximum number of participants allowed
+</ParamField>
+
+<ParamField body="meetingPoint" type="String" required>
+  Location where the tour starts
+</ParamField>
+
+<ParamField body="status" type="String" required>
+  Tour status. Options: `DRAFT`, `PENDING`, `ACTIVE`, `INACTIVE`
+</ParamField>
+
+<ParamField body="coverImageUrl" type="String">
+  URL of the tour's cover image
+</ParamField>
+
+<ParamField body="imageClass" type="String">
+  CSS class for image styling
+</ParamField>
+
+<ParamField body="ratingAvg" type="BigDecimal">
+  Average rating of the tour
+</ParamField>
+
+<ParamField body="bookingsCount" type="Integer">
+  Total number of bookings
+</ParamField>
+
+<ParamField body="createdAt" type="LocalDateTime">
+  Timestamp when the tour was created
+</ParamField>
+
+<ParamField body="updatedAt" type="LocalDateTime">
+  Timestamp when the tour was last updated
+</ParamField>
+
+### Response
+
+<ResponseField name="tourId" type="Long">
+  Unique identifier for the tour
+</ResponseField>
+
+<ResponseField name="guideId" type="Long">
+  ID of the guide offering the tour
+</ResponseField>
+
+<ResponseField name="categoryId" type="Integer">
+  ID of the tour category
+</ResponseField>
+
+<ResponseField name="title" type="String">
+  Title of the tour
+</ResponseField>
+
+<ResponseField name="description" type="String">
+  Tour description
+</ResponseField>
+
+<ResponseField name="price" type="BigDecimal">
+  Price of the tour
+</ResponseField>
+
+<ResponseField name="currency" type="String">
+  Currency code
+</ResponseField>
+
+<ResponseField name="durationHours" type="BigDecimal">
+  Duration in hours
+</ResponseField>
+
+<ResponseField name="maxGroupSize" type="Integer">
+  Maximum group size
+</ResponseField>
+
+<ResponseField name="meetingPoint" type="String">
+  Meeting point location
+</ResponseField>
+
+<ResponseField name="status" type="String">
+  Current tour status
+</ResponseField>
+
+<ResponseField name="coverImageUrl" type="String">
+  Cover image URL
+</ResponseField>
+
+<ResponseField name="imageClass" type="String">
+  Image CSS class
+</ResponseField>
+
+<ResponseField name="ratingAvg" type="BigDecimal">
+  Average rating
+</ResponseField>
+
+<ResponseField name="bookingsCount" type="Integer">
+  Total bookings
+</ResponseField>
+
+<ResponseField name="createdAt" type="LocalDateTime">
+  Creation timestamp
+</ResponseField>
+
+<ResponseField name="updatedAt" type="LocalDateTime">
+  Last update timestamp
+</ResponseField>
+
+### Example Request
+
+```bash
+curl -X POST http://localhost:8080/api/tours \
+  -H "Content-Type: application/json" \
+  -d '{
+    "guideId": 1,
+    "categoryId": 2,
+    "title": "Historic Centro Tour",
+    "description": "Explore the historic center of Mexico City with stories of ancient civilizations",
+    "price": 450.00,
+    "currency": "MXN",
+    "durationHours": 3.5,
+    "maxGroupSize": 8,
+    "meetingPoint": "Zócalo Plaza",
+    "status": "ACTIVE",
+    "coverImageUrl": "https://example.com/tours/centro.jpg"
+  }'
+```
+
+### Example Response
+
+```json
+{
+  "tourId": 123,
+  "guideId": 1,
+  "categoryId": 2,
+  "title": "Historic Centro Tour",
+  "description": "Explore the historic center of Mexico City with stories of ancient civilizations",
+  "price": 450.00,
+  "currency": "MXN",
+  "durationHours": 3.5,
+  "maxGroupSize": 8,
+  "meetingPoint": "Zócalo Plaza",
+  "status": "ACTIVE",
+  "coverImageUrl": "https://example.com/tours/centro.jpg",
+  "imageClass": null,
+  "ratingAvg": 0.0,
+  "bookingsCount": 0,
+  "createdAt": "2026-03-11T10:30:00",
+  "updatedAt": "2026-03-11T10:30:00"
+}
+```
+
+</api>
+
+## Get All Tours
+
+<api method="GET" path="/api/tours">
+Retrieves all tours in the system.
+
+### Response
+
+Returns an array of tour objects with the same structure as the Create Tour response.
+
+### Example Request
+
+```bash
+curl http://localhost:8080/api/tours
+```
+
+### Example Response
+
+```json
+[
+  {
+    "tourId": 123,
+    "guideId": 1,
+    "categoryId": 2,
+    "title": "Historic Centro Tour",
+    "description": "Explore the historic center of Mexico City",
+    "price": 450.00,
+    "currency": "MXN",
+    "durationHours": 3.5,
+    "maxGroupSize": 8,
+    "meetingPoint": "Zócalo Plaza",
+    "status": "ACTIVE",
+    "coverImageUrl": "https://example.com/tours/centro.jpg",
+    "imageClass": null,
+    "ratingAvg": 4.8,
+    "bookingsCount": 42,
+    "createdAt": "2026-03-11T10:30:00",
+    "updatedAt": "2026-03-11T10:30:00"
+  },
+  {
+    "tourId": 124,
+    "guideId": 2,
+    "categoryId": 1,
+    "title": "Teotihuacán Pyramids Adventure",
+    "description": "Visit the ancient pyramids of the Sun and Moon",
+    "price": 850.00,
+    "currency": "MXN",
+    "durationHours": 6.0,
+    "maxGroupSize": 12,
+    "meetingPoint": "Terminal Central del Norte",
+    "status": "ACTIVE",
+    "coverImageUrl": "https://example.com/tours/teotihuacan.jpg",
+    "imageClass": null,
+    "ratingAvg": 4.9,
+    "bookingsCount": 87,
+    "createdAt": "2026-03-10T09:15:00",
+    "updatedAt": "2026-03-10T09:15:00"
+  }
+]
+```
+
+</api>
+
+## Get Tour by ID
+
+<api method="GET" path="/api/tours/{id}">
+Retrieves a specific tour by its ID.
+
+### Path Parameters
+
+<ParamField path="id" type="Long" required>
+  The unique identifier of the tour
+</ParamField>
+
+### Response
+
+Returns a single tour object with the same structure as the Create Tour response.
+
+### Example Request
+
+```bash
+curl http://localhost:8080/api/tours/123
+```
+
+### Example Response
+
+```json
+{
+  "tourId": 123,
+  "guideId": 1,
+  "categoryId": 2,
+  "title": "Historic Centro Tour",
+  "description": "Explore the historic center of Mexico City",
+  "price": 450.00,
+  "currency": "MXN",
+  "durationHours": 3.5,
+  "maxGroupSize": 8,
+  "meetingPoint": "Zócalo Plaza",
+  "status": "ACTIVE",
+  "coverImageUrl": "https://example.com/tours/centro.jpg",
+  "imageClass": null,
+  "ratingAvg": 4.8,
+  "bookingsCount": 42,
+  "createdAt": "2026-03-11T10:30:00",
+  "updatedAt": "2026-03-11T10:30:00"
+}
+```
+
+</api>
+
+## Update Tour
+
+<api method="PUT" path="/api/tours/{id}">
+Updates an existing tour.
+
+### Path Parameters
+
+<ParamField path="id" type="Long" required>
+  The unique identifier of the tour to update
+</ParamField>
+
+### Request Body
+
+All fields from the Create Tour request can be updated. Fields are optional - only send the fields you want to change.
+
+<ParamField body="guideId" type="Long">
+  ID of the guide
+</ParamField>
+
+<ParamField body="categoryId" type="Integer">
+  ID of the tour category
+</ParamField>
+
+<ParamField body="title" type="String">
+  Title of the tour
+</ParamField>
+
+<ParamField body="description" type="String">
+  Tour description
+</ParamField>
+
+<ParamField body="price" type="BigDecimal">
+  Price of the tour
+</ParamField>
+
+<ParamField body="currency" type="String">
+  Currency code
+</ParamField>
+
+<ParamField body="durationHours" type="BigDecimal">
+  Duration in hours
+</ParamField>
+
+<ParamField body="maxGroupSize" type="Integer">
+  Maximum group size
+</ParamField>
+
+<ParamField body="meetingPoint" type="String">
+  Meeting point location
+</ParamField>
+
+<ParamField body="status" type="String">
+  Tour status. Options: `DRAFT`, `PENDING`, `ACTIVE`, `INACTIVE`
+</ParamField>
+
+<ParamField body="coverImageUrl" type="String">
+  Cover image URL
+</ParamField>
+
+<ParamField body="imageClass" type="String">
+  Image CSS class
+</ParamField>
+
+<ParamField body="ratingAvg" type="BigDecimal">
+  Average rating
+</ParamField>
+
+<ParamField body="bookingsCount" type="Integer">
+  Total bookings
+</ParamField>
+
+### Response
+
+Returns the updated tour object.
+
+### Example Request
+
+```bash
+curl -X PUT http://localhost:8080/api/tours/123 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "price": 500.00,
+    "status": "INACTIVE"
+  }'
+```
+
+### Example Response
+
+```json
+{
+  "tourId": 123,
+  "guideId": 1,
+  "categoryId": 2,
+  "title": "Historic Centro Tour",
+  "description": "Explore the historic center of Mexico City",
+  "price": 500.00,
+  "currency": "MXN",
+  "durationHours": 3.5,
+  "maxGroupSize": 8,
+  "meetingPoint": "Zócalo Plaza",
+  "status": "INACTIVE",
+  "coverImageUrl": "https://example.com/tours/centro.jpg",
+  "imageClass": null,
+  "ratingAvg": 4.8,
+  "bookingsCount": 42,
+  "createdAt": "2026-03-11T10:30:00",
+  "updatedAt": "2026-03-11T14:45:00"
+}
+```
+
+</api>
+
+## Delete Tour
+
+<api method="DELETE" path="/api/tours/{id}">
+Deletes a tour from the system.
+
+### Path Parameters
+
+<ParamField path="id" type="Long" required>
+  The unique identifier of the tour to delete
+</ParamField>
+
+### Response
+
+Returns HTTP 204 No Content on successful deletion.
+
+### Example Request
+
+```bash
+curl -X DELETE http://localhost:8080/api/tours/123
+```
+
+</api>
