@@ -1,0 +1,169 @@
+{
+  "projectType": "saas",
+  "projectName": "Kin Conecta",
+  "projectDescription": "A travel social network platform connecting tourists with local guides in Mexico for authentic and personalized experiences.",
+  "theme": "almond",
+  "primaryColor": "#F59E0B",
+  "lightColor": "#FCD34D",
+  "darkColor": "#D97706",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "installation"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/user-roles",
+              "concepts/tours",
+              "concepts/matching-algorithm",
+              "concepts/authentication"
+            ]
+          },
+          {
+            "group": "User Guides",
+            "pages": [
+              "guides/tourist-guide",
+              "guides/guide-guide",
+              "guides/creating-tours",
+              "guides/booking-tours",
+              "guides/messaging",
+              "guides/reviews"
+            ]
+          },
+          {
+            "group": "Features",
+            "pages": [
+              "features/profiles",
+              "features/compatibility-matching",
+              "features/chat-messaging",
+              "features/bookings",
+              "features/payments",
+              "features/reviews-ratings"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "api/overview",
+              "api/authentication",
+              "api/errors"
+            ]
+          },
+          {
+            "group": "Users & Profiles",
+            "pages": [
+              "api/users",
+              "api/tourist-profiles",
+              "api/guide-profiles",
+              "api/languages"
+            ]
+          },
+          {
+            "group": "Tours & Destinations",
+            "pages": [
+              "api/tours",
+              "api/destinations",
+              "api/tour-categories",
+              "api/bookings"
+            ]
+          },
+          {
+            "group": "Matching & Favorites",
+            "pages": [
+              "api/compatibility-profiles",
+              "api/favorite-guides",
+              "api/favorite-tours"
+            ]
+          },
+          {
+            "group": "Messaging",
+            "pages": [
+              "api/chat-threads",
+              "api/chat-messages",
+              "api/notifications"
+            ]
+          },
+          {
+            "group": "Reviews & Ratings",
+            "pages": [
+              "api/reviews",
+              "api/review-replies"
+            ]
+          },
+          {
+            "group": "Guide Management",
+            "pages": [
+              "api/guide-certifications",
+              "api/guide-calendar",
+              "api/income-transactions",
+              "api/withdrawals"
+            ]
+          },
+          {
+            "group": "Support & Help",
+            "pages": [
+              "api/support-tickets",
+              "api/faq",
+              "api/contact-messages",
+              "api/newsletter"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Deployment",
+        "groups": [
+          {
+            "group": "Setup",
+            "pages": [
+              "deployment/database-setup",
+              "deployment/backend-deployment",
+              "deployment/frontend-deployment",
+              "deployment/configuration"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Dual-role system for tourists and local guides",
+    "AI-powered compatibility matching algorithm",
+    "Real-time chat messaging system",
+    "Tour creation and booking management",
+    "Reviews and ratings system",
+    "Guide income tracking and withdrawals",
+    "Multi-language support",
+    "Support ticket system"
+  ],
+  "publicApiSurface": [
+    "POST /api/users - User registration",
+    "POST /api/auth_sessions - User authentication",
+    "GET /api/tours - List all tours",
+    "POST /api/tours - Create a new tour",
+    "GET /api/guide_profiles - List guide profiles",
+    "POST /api/trip_bookings - Book a tour",
+    "GET /api/chat_threads - Get chat conversations",
+    "POST /api/chat_messages - Send a message",
+    "POST /api/reviews - Create a review",
+    "GET /api/destinations - List destinations",
+    "POST /api/favorite_guides - Add guide to favorites",
+    "GET /api/compatibility_profiles - Get compatibility profile",
+    "POST /api/support_tickets - Create support ticket",
+    "GET /api/income_transactions - Get guide earnings"
+  ]
+}
